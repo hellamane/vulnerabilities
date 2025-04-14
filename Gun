@@ -1,0 +1,2527 @@
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-04-14 01:18:54
+-- Luau version 6, Types version 3
+-- Time taken: 0.224290 seconds
+
+-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+local HttpService_upvr_2 = game:GetService("HttpService")
+local RunService_upvr_2 = game:GetService("RunService")
+local UserInputService_upvr = game:GetService("UserInputService")
+local TweenService_upvr_2 = game:GetService("TweenService")
+local Debris_upvr_2 = game:GetService("Debris")
+local Workspace_upvr = game:GetService("Workspace")
+local ReplicatedStorage_2 = game:GetService("ReplicatedStorage")
+local Miscs_upvr_2 = ReplicatedStorage_2:WaitForChild("Miscs")
+local Modules_2 = ReplicatedStorage_2:WaitForChild("Modules")
+local Remotes = ReplicatedStorage_2:WaitForChild("Remotes")
+local Parent_upvr = script.Parent
+local ValueFolder_upvr = Parent_upvr:WaitForChild("ValueFolder")
+local CurrentCamera_upvr = Workspace_upvr.CurrentCamera
+local LocalPlayer_upvr = game:GetService("Players").LocalPlayer
+local Character = LocalPlayer_upvr.Character
+if not Character or not Character.Parent then
+end
+local Humanoid_upvr_2 = LocalPlayer_upvr.CharacterAdded:Wait():WaitForChild("Humanoid")
+local HumanoidRootPart_3_upvr = LocalPlayer_upvr.CharacterAdded:Wait():WaitForChild("HumanoidRootPart")
+if not LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("Torso") then
+end
+if not LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("Left Arm") then
+end
+if not LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("Right Arm") then
+	local RightHand_upvr = LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("RightHand")
+end
+local ChangeMagAndAmmo_upvr_2 = Parent_upvr:WaitForChild("GunServer"):WaitForChild("ChangeMagAndAmmo")
+local GunGUI_2 = script:WaitForChild("GunGUI")
+local tbl_21_upvr = {
+	AimButton = GunGUI_2.MobileButtons.AimButton;
+	FireButton = GunGUI_2.MobileButtons.FireButton;
+	SubFireButton = GunGUI_2.SubFireButton;
+	HoldDownButton = GunGUI_2.MobileButtons.HoldDownButton;
+	InspectButton = GunGUI_2.MobileButtons.InspectButton;
+	ReloadButton = GunGUI_2.MobileButtons.ReloadButton;
+	SwitchButton = GunGUI_2.MobileButtons.SwitchButton;
+	MeleeButton = GunGUI_2.MobileButtons.MeleeButton;
+	AltButton = GunGUI_2.MobileButtons.AltButton;
+}
+if UserInputService_upvr.TouchEnabled then
+	local JumpButton_upvw_2 = LocalPlayer_upvr:WaitForChild("PlayerGui"):WaitForChild("TouchGui"):WaitForChild("TouchControlFrame"):WaitForChild("JumpButton")
+end
+local GunVisualEffects_upvr_2 = Miscs_upvr_2.GunVisualEffects
+local Scanners_upvr = Miscs_upvr_2.Scanners
+local SmokeTrail_upvr_2 = require(Modules_2.SmokeTrail)
+local DamageModule_upvr = require(Modules_2.DamageModule)
+local Utilities = require(Modules_2.Utilities)
+local Thread_upvr = Utilities.Thread
+local ProjectileMotion_upvr = Utilities.ProjectileMotion
+local Spring_2 = Utilities.Spring
+local CloneTable_upvr = Utilities.CloneTable
+local unpack_result1_upvr_2, _ = unpack(Utilities.DataPacket)
+local gunEvent_upvr_2 = ReplicatedStorage_2:WaitForChild("Events").gunEvent
+local InflictTarget_upvr_2 = Remotes.InflictTarget
+local ShatterGlass_upvr = Remotes.ShatterGlass
+local VisibleMuzzle_upvr = Remotes.VisibleMuzzle
+local any_GenerateGUID_result1_upvr = HttpService_upvr_2:GenerateGUID()
+local var583_upvr = "UpdateGun_"..any_GenerateGUID_result1_upvr
+if not GunGUI_2.IgnoreGuiInset or not game:GetService("GuiService"):GetGuiInset() then
+	local vector2_upvr = Vector2.new(0, 0)
+end
+local TargetMarker_upvr_2 = script:WaitForChild("TargetMarker")
+local var586_upvw
+local tbl_6_upvr = {
+	Equipped = false;
+	ActuallyEquipped = false;
+	Enabled = true;
+	Down = false;
+	HoldDown = false;
+	Reloading = false;
+	CanCancelReload = false;
+	Running = false;
+	AimDown = false;
+	Scoping = false;
+	Inspecting = false;
+	Charging = false;
+	Charged = false;
+	Overheated = false;
+	CanBeCooledDown = true;
+	Switching = false;
+	Alting = false;
+	AlreadyHit = false;
+	CurrentFireRate = 0;
+	ShootCounts = 0;
+	CurrentRate = 0;
+	LastRate = 0;
+	ElapsedTime = 0;
+	CasingCount = 0;
+	LastUpdate = nil;
+	LastUpdate2 = nil;
+	Radar = nil;
+	Beam = nil;
+	Attach0 = nil;
+	Attach1 = nil;
+	Misc = nil;
+	LaserTrail = nil;
+	Hitbox = nil;
+	Hitbox2 = nil;
+	BoltSegments = {};
+	Animations = {};
+	SettingModules = {};
+	Keyframes = {};
+	KeyframeConnections = {};
+	Casings = {};
+	HitHumanoids = {};
+	MeleeHitHumanoids = {};
+	BlockedModels = {};
+	InitialSensitivity = UserInputService_upvr.MouseDeltaSensitivity;
+	Motor6DInstances = {};
+	GripId = 0;
+	DefaultC0 = nil;
+	DefaultC1 = nil;
+	Handle2 = nil;
+	Grip2 = nil;
+}
+local tbl_18_upvr = {}
+local tbl_36_upvr = {CurrentCamera_upvr, Parent_upvr, LocalPlayer_upvr.CharacterAdded:Wait()}
+local OverlapParams_new_result1_upvr_2 = OverlapParams.new()
+OverlapParams_new_result1_upvr_2.FilterType = Enum.RaycastFilterType.Exclude
+OverlapParams_new_result1_upvr_2.FilterDescendantsInstances = tbl_36_upvr
+OverlapParams_new_result1_upvr_2.MaxParts = 0
+OverlapParams_new_result1_upvr_2.CollisionGroup = "Default"
+local RaycastParams_new_result1_upvr = RaycastParams.new()
+RaycastParams_new_result1_upvr.FilterType = Enum.RaycastFilterType.Exclude
+RaycastParams_new_result1_upvr.FilterDescendantsInstances = tbl_36_upvr
+RaycastParams_new_result1_upvr.IgnoreWater = true
+local Setting_upvr_2 = Parent_upvr:WaitForChild("Setting")
+local var592_2_upvr = require(Setting_upvr_2)
+local module_upvr = require(Setting_upvr_2:WaitForChild("CanShootConditions"))
+if var592_2_upvr.DualWeldEnabled then
+	tbl_6_upvr.Handle2 = Parent_upvr:WaitForChild("Handle2", 2)
+	if tbl_6_upvr.Handle2 == nil and var592_2_upvr.DualWeldEnabled then
+		error("\"Dual\" setting is enabled but \"Handle2\" is missing!")
+	end
+end
+local tbl_28_upvr = {}
+function GetValueFolders() -- Line 175
+	--[[ Upvalues[5]:
+		[1]: Setting_upvr_2 (readonly)
+		[2]: tbl_28_upvr (readonly)
+		[3]: tbl_6_upvr (readonly)
+		[4]: tbl_18_upvr (readonly)
+		[5]: ValueFolder_upvr (readonly)
+	]]
+	for _, v in pairs(Setting_upvr_2:GetChildren()) do
+		if v.Name ~= "CanShootConditions" and v.Name ~= "ConditionableGunMods" and v.Name ~= "OnClientShootEvents" and not table.find(tbl_28_upvr, v) then
+			table.insert(tbl_28_upvr, v)
+			table.insert(tbl_6_upvr.SettingModules, require(v))
+			local tonumber_result1_2 = tonumber(v.Name)
+			table.insert(tbl_18_upvr, {
+				Mag = ValueFolder_upvr[tonumber_result1_2].Mag.Value;
+				Ammo = ValueFolder_upvr[tonumber_result1_2].Ammo.Value;
+				Heat = 0;
+				MaxAmmo = tbl_6_upvr.SettingModules[tonumber_result1_2].MaxAmmo;
+				ElapsedCooldownTime = 0;
+				ChargeLevel = 0;
+				FireModes = tbl_6_upvr.SettingModules[tonumber_result1_2].FireModes;
+				FireMode = 1;
+				ShotsForDepletion = 0;
+				ShotID = 0;
+				HandleIndex = 1;
+				FireAnimIndex = 1;
+				LastFireAnimIndex = 1;
+				AimFireAnimIndex = 1;
+				AimLastFireAnimIndex = 1;
+				ShotgunPumpinAnimIndex = 1;
+				ChargeLevelCap = math.clamp(tbl_6_upvr.SettingModules[tonumber_result1_2].ChargeLevelCap, 1, 3);
+			})
+		end
+	end
+end
+GetValueFolders()
+Setting_upvr_2.ChildAdded:Connect(GetValueFolders)
+for i_2, v_2 in ipairs(Parent_upvr:WaitForChild("AnimationFolder"):GetChildren()) do
+	local tbl_40 = {}
+	if tbl_6_upvr.SettingModules[i_2].EquippedAnimationID ~= nil then
+		tbl_40.EquippedAnim = v_2:WaitForChild("EquippedAnim")
+		tbl_40.EquippedAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.EquippedAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].EmptyEquippedAnimationID ~= nil then
+		tbl_40.EmptyEquippedAnim = v_2:WaitForChild("EmptyEquippedAnim")
+		tbl_40.EmptyEquippedAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.EmptyEquippedAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].IdleAnimationID ~= nil then
+		tbl_40.IdleAnim = v_2:WaitForChild("IdleAnim")
+		tbl_40.IdleAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.IdleAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].EmptyIdleAnimationID ~= nil then
+		tbl_40.EmptyIdleAnim = v_2:WaitForChild("EmptyIdleAnim")
+		tbl_40.EmptyIdleAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.EmptyIdleAnim)
+	end
+	if 0 < #tbl_6_upvr.SettingModules[i_2].FireAnimations then
+		tbl_40.FireAnims = {}
+		for i_3, v_3 in ipairs(tbl_6_upvr.SettingModules[i_2].FireAnimations) do
+			if v_3.FireAnimationID ~= nil then
+				table.insert(tbl_40.FireAnims, {Humanoid_upvr_2:LoadAnimation(v_2:WaitForChild("FireAnimations"):WaitForChild("FireAnim_"..i_3)), v_3.FireAnimationSpeed})
+			end
+		end
+	end
+	if 0 < #tbl_6_upvr.SettingModules[i_2].LastFireAnimations then
+		tbl_40.LastFireAnims = {}
+		for i_4, v_4 in ipairs(tbl_6_upvr.SettingModules[i_2].LastFireAnimations) do
+			if v_4.LastFireAnimationID ~= nil then
+				table.insert(tbl_40.LastFireAnims, {Humanoid_upvr_2:LoadAnimation(v_2:WaitForChild("LastFireAnimations"):WaitForChild("LastFireAnim_"..i_4)), v_4.LastFireAnimationSpeed})
+			end
+		end
+	end
+	if 0 < #tbl_6_upvr.SettingModules[i_2].ShotgunPumpinAnimations then
+		tbl_40.ShotgunPumpinAnims = {}
+		for i_5, v_5 in ipairs(tbl_6_upvr.SettingModules[i_2].ShotgunPumpinAnimations) do
+			if v_5.ShotgunPumpinAnimationID ~= nil then
+				table.insert(tbl_40.ShotgunPumpinAnims, {Humanoid_upvr_2:LoadAnimation(v_2:WaitForChild("ShotgunPumpinAnimations"):WaitForChild("ShotgunPumpinAnim_"..i_5)), v_5.ShotgunPumpinAnimationSpeed})
+			end
+		end
+	end
+	if tbl_6_upvr.SettingModules[i_2].ShotgunClipinAnimationID ~= nil then
+		tbl_40.ShotgunClipinAnim = v_2:WaitForChild("ShotgunClipinAnim")
+		tbl_40.ShotgunClipinAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.ShotgunClipinAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].ReloadAnimationID ~= nil then
+		tbl_40.ReloadAnim = v_2:WaitForChild("ReloadAnim")
+		tbl_40.ReloadAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.ReloadAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].HoldDownAnimationID ~= nil then
+		tbl_40.HoldDownAnim = v_2:WaitForChild("HoldDownAnim")
+		tbl_40.HoldDownAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.HoldDownAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].AimIdleAnimationID ~= nil then
+		tbl_40.AimIdleAnim = v_2:WaitForChild("AimIdleAnim")
+		tbl_40.AimIdleAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.AimIdleAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].EmptyAimIdleAnimationID ~= nil then
+		tbl_40.EmptyAimIdleAnim = v_2:WaitForChild("EmptyAimIdleAnim")
+		tbl_40.EmptyAimIdleAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.EmptyAimIdleAnim)
+	end
+	if 0 < #tbl_6_upvr.SettingModules[i_2].AimFireAnimations then
+		tbl_40.AimFireAnims = {}
+		for i_6, v_6 in ipairs(tbl_6_upvr.SettingModules[i_2].AimFireAnimations) do
+			if v_6.AimFireAnimationID ~= nil then
+				table.insert(tbl_40.AimFireAnims, {Humanoid_upvr_2:LoadAnimation(v_2:WaitForChild("AimFireAnimations"):WaitForChild("AimFireAnim_"..i_6)), v_6.AimFireAnimationSpeed})
+			end
+		end
+	end
+	if 0 < #tbl_6_upvr.SettingModules[i_2].AimLastFireAnimations then
+		tbl_40.AimLastFireAnims = {}
+		for i_7, v_7 in ipairs(tbl_6_upvr.SettingModules[i_2].AimLastFireAnimations) do
+			if v_7.AimFireAnimationID ~= nil then
+				table.insert(tbl_40.AimLastFireAnims, {Humanoid_upvr_2:LoadAnimation(v_2:WaitForChild("AimLastFireAnimations"):WaitForChild("AimLastFireAnim_"..i_7)), v_7.AimLastFireAnimationSpeed})
+			end
+		end
+	end
+	if tbl_6_upvr.SettingModules[i_2].AimChargingAnimationID ~= nil then
+		tbl_40.AimChargingAnim = v_2:WaitForChild("AimChargingAnim")
+		tbl_40.AimChargingAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.AimChargingAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].TacticalReloadAnimationEnabled and tbl_6_upvr.SettingModules[i_2].TacticalReloadAnimationID ~= nil then
+		tbl_40.TacticalReloadAnim = v_2:WaitForChild("TacticalReloadAnim")
+		tbl_40.TacticalReloadAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.TacticalReloadAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].InspectAnimationEnabled and tbl_6_upvr.SettingModules[i_2].InspectAnimationID ~= nil then
+		tbl_40.InspectAnim = v_2:WaitForChild("InspectAnim")
+		tbl_40.InspectAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.InspectAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].InspectAnimationEnabled and tbl_6_upvr.SettingModules[i_2].EmptyInspectAnimationID ~= nil then
+		tbl_40.EmptyInspectAnim = v_2:WaitForChild("EmptyInspectAnim")
+		tbl_40.EmptyInspectAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.EmptyInspectAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].ShotgunReload and tbl_6_upvr.SettingModules[i_2].PreShotgunReload and tbl_6_upvr.SettingModules[i_2].PreShotgunReloadAnimationID ~= nil then
+		tbl_40.PreShotgunReloadAnim = v_2:WaitForChild("PreShotgunReloadAnim")
+		tbl_40.PreShotgunReloadAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.PreShotgunReloadAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].MinigunRevUpAnimationID ~= nil then
+		tbl_40.MinigunRevUpAnim = v_2:WaitForChild("MinigunRevUpAnim")
+		tbl_40.MinigunRevUpAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.MinigunRevUpAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].MinigunRevDownAnimationID ~= nil then
+		tbl_40.MinigunRevDownAnim = v_2:WaitForChild("MinigunRevDownAnim")
+		tbl_40.MinigunRevDownAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.MinigunRevDownAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].ChargingAnimationEnabled and tbl_6_upvr.SettingModules[i_2].ChargingAnimationID ~= nil then
+		tbl_40.ChargingAnim = v_2:WaitForChild("ChargingAnim")
+		tbl_40.ChargingAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.ChargingAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].SelectiveFireEnabled and tbl_6_upvr.SettingModules[i_2].SwitchAnimationID ~= nil then
+		tbl_40.SwitchAnim = v_2:WaitForChild("SwitchAnim")
+		tbl_40.SwitchAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.SwitchAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].BatteryEnabled and tbl_6_upvr.SettingModules[i_2].OverheatAnimationID ~= nil then
+		tbl_40.OverheatAnim = v_2:WaitForChild("OverheatAnim")
+		tbl_40.OverheatAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.OverheatAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].MeleeAttackEnabled and tbl_6_upvr.SettingModules[i_2].MeleeAttackAnimationID ~= nil then
+		tbl_40.MeleeAttackAnim = v_2:WaitForChild("MeleeAttackAnim")
+		tbl_40.MeleeAttackAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.MeleeAttackAnim)
+	end
+	if var592_2_upvr.AltFire and tbl_6_upvr.SettingModules[i_2].AltAnimationID ~= nil then
+		tbl_40.AltAnim = v_2:WaitForChild("AltAnim")
+		tbl_40.AltAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.AltAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].LaserBeamStartupAnimationID ~= nil then
+		tbl_40.LaserBeamStartupAnim = v_2:WaitForChild("LaserBeamStartupAnim")
+		tbl_40.LaserBeamStartupAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.LaserBeamStartupAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].LaserBeamLoopAnimationID ~= nil then
+		tbl_40.LaserBeamLoopAnim = v_2:WaitForChild("LaserBeamLoopAnim")
+		tbl_40.LaserBeamLoopAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.LaserBeamLoopAnim)
+	end
+	if tbl_6_upvr.SettingModules[i_2].LaserBeamStopAnimationID ~= nil then
+		tbl_40.LaserBeamStopAnim = v_2:WaitForChild("LaserBeamStopAnim")
+		tbl_40.LaserBeamStopAnim = Humanoid_upvr_2:LoadAnimation(tbl_40.LaserBeamStopAnim)
+	end
+	table.insert(tbl_6_upvr.Animations, tbl_40)
+end
+local var627_upvw = 1
+local var628_upvw = tbl_6_upvr.SettingModules[var627_upvw]
+local var629_upvw = tbl_18_upvr[var627_upvw]
+local var630_upvw = tbl_6_upvr.Animations[var627_upvw]
+local var631_upvw = GunGUI_2.Crosshair[var627_upvw]
+for i_8, v_8 in pairs(GunGUI_2.Crosshair:GetChildren()) do
+	local children = v_8:IsA("CanvasGroup")
+	if children then
+		if tonumber(v_8.Name) ~= var627_upvw then
+			children = false
+		else
+			children = true
+		end
+		v_8.Visible = children
+	end
+end
+tbl_6_upvr.ShootCounts = var628_upvw.ShootCounts
+if var592_2_upvr.UniversalAmmoEnabled then
+	local tbl_24 = {}
+	i_8 = ValueFolder_upvr.Ammo
+	tbl_24.Ammo = i_8.Value
+	tbl_24.MaxAmmo = var592_2_upvr.Ammo
+	local _ = tbl_24
+else
+end
+local SOME_8_upvw = Parent_upvr:FindFirstChild(var628_upvw.Handles[1], true)
+if 0 >= #var630_upvw.AimFireAnims or not var630_upvw.AimFireAnims[1][1] then
+	local var639_upvw
+end
+if 0 >= #var630_upvw.AimFireAnims or not var630_upvw.AimFireAnims[1][2] then
+	local var640_upvw
+end
+if 0 >= #var630_upvw.FireAnims or not var630_upvw.FireAnims[1][1] then
+	local var641_upvw
+end
+if 0 >= #var630_upvw.FireAnims or not var630_upvw.FireAnims[1][2] then
+	local var642_upvw
+end
+if 0 >= #var630_upvw.AimLastFireAnims or not var630_upvw.AimLastFireAnims[1][1] then
+	local var643_upvw
+end
+if 0 >= #var630_upvw.AimLastFireAnims or not var630_upvw.AimLastFireAnims[1][2] then
+	local var644_upvw
+end
+if 0 >= #var630_upvw.LastFireAnims or not var630_upvw.LastFireAnims[1][1] then
+	local var645_upvw
+end
+if 0 >= #var630_upvw.LastFireAnims or not var630_upvw.LastFireAnims[1][2] then
+	local var646_upvw
+end
+if 0 >= #var630_upvw.ShotgunPumpinAnims or not var630_upvw.ShotgunPumpinAnims[1][1] then
+	local var647_upvw
+end
+if 0 >= #var630_upvw.ShotgunPumpinAnims or not var630_upvw.ShotgunPumpinAnims[1][2] then
+	local var648_upvw
+end
+local tbl_20_upvr = {}
+local Attachment_upvr_2 = Instance.new("Attachment")
+Attachment_upvr_2.Name = "CrosshairPointAttachment"
+local SOME_7_upvw = GunVisualEffects_upvr_2:FindFirstChild(var628_upvw.LaserBeamEffect)
+if SOME_7_upvw then
+	for _, v_9 in pairs(SOME_7_upvw.HitEffect:GetChildren()) do
+		if v_9.ClassName == "ParticleEmitter" then
+			local clone_2 = v_9:Clone()
+			clone_2.Enabled = true
+			clone_2.Parent = Attachment_upvr_2
+		end
+	end
+	for _, v_10 in pairs(SOME_7_upvw.LaserBeams:GetChildren()) do
+		if v_10.ClassName == "Beam" then
+			table.insert(tbl_20_upvr, v_10:Clone())
+		end
+	end
+end
+local function _(arg1) -- Line 421, Named "FindAnimationNameForKeyframe"
+	--[[ Upvalues[2]:
+		[1]: var628_upvw (read and write)
+		[2]: tbl_6_upvr (readonly)
+	]]
+	if var628_upvw.AnimationKeyframes[arg1.Name] then
+		local tbl_27 = {}
+		tbl_27[1] = arg1
+		tbl_27[2] = var628_upvw.AnimationKeyframes[arg1.Name]
+		table.insert(tbl_6_upvr.Keyframes, tbl_27)
+	end
+end
+for SetCrossSettings, Random2DDirection in pairs(var630_upvw) do
+	if typeof(Random2DDirection) == "table" then
+		for i_12, v_12 in pairs(Random2DDirection) do
+			local _1_3 = v_12[1]
+			if var628_upvw.AnimationKeyframes[_1_3.Name] then
+				table.insert(tbl_6_upvr.Keyframes, {_1_3, var628_upvw.AnimationKeyframes[_1_3.Name]})
+			end
+		end
+	elseif var628_upvw.AnimationKeyframes[Random2DDirection.Name] then
+		local tbl_14 = {}
+		i_12 = Random2DDirection
+		v_12 = var628_upvw.AnimationKeyframes[Random2DDirection.Name]
+		tbl_14[1] = i_12
+		tbl_14[2] = v_12
+		table.insert(tbl_6_upvr.Keyframes, tbl_14)
+	end
+end
+if var592_2_upvr.MagCartridge and not var628_upvw.BatteryEnabled and var628_upvw.AmmoPerMag ~= math.huge then
+	for i_13 = 1, var628_upvw.AmmoPerMag do
+		Random2DDirection = GunGUI_2.MagCartridge.UIGridLayout
+		SetCrossSettings = Random2DDirection.Template:Clone()
+		SetCrossSettings.Name = i_13
+		SetCrossSettings.LayoutOrder = i_13
+		Random2DDirection = GunGUI_2.MagCartridge
+		SetCrossSettings.Parent = Random2DDirection
+		local var669_upvr
+	end
+end
+local tbl_4_upvr = {
+	Scope = Spring_2.spring.new(Vector3.new(0, 200, 0));
+	Knockback = Spring_2.spring.new(Vector3.new());
+	CameraSpring = Spring_2.spring.new(Vector3.new());
+	CrossScale = Spring_2.spring.new(0);
+	CrossSpring = Spring_2.spring.new(0);
+}
+tbl_4_upvr.Scope.s = var628_upvw.ScopeSwaySpeed
+tbl_4_upvr.Scope.d = var628_upvw.ScopeSwayDamper
+tbl_4_upvr.Knockback.s = var628_upvw.ScopeKnockbackSpeed
+tbl_4_upvr.Knockback.d = var628_upvw.ScopeKnockbackDamper
+tbl_4_upvr.CameraSpring.s = var628_upvw.RecoilSpeed
+tbl_4_upvr.CameraSpring.d = var628_upvw.RecoilDamper
+tbl_4_upvr.CrossScale.s = 10
+tbl_4_upvr.CrossScale.d = 0.8
+tbl_4_upvr.CrossScale.t = 1
+tbl_4_upvr.CrossSpring.s = 12
+tbl_4_upvr.CrossSpring.d = 0.65
+local function _(arg1) -- Line 470, Named "SetCrossScale"
+	--[[ Upvalues[1]:
+		[1]: tbl_4_upvr (readonly)
+	]]
+	tbl_4_upvr.CrossScale.t = arg1
+end
+local function _(arg1) -- Line 474, Named "SetCrossSize"
+	--[[ Upvalues[1]:
+		[1]: tbl_4_upvr (readonly)
+	]]
+	tbl_4_upvr.CrossSpring.t = arg1
+end
+function SetCrossSettings(arg1, arg2, arg3) -- Line 478
+	--[[ Upvalues[1]:
+		[1]: tbl_4_upvr (readonly)
+	]]
+	tbl_4_upvr.CrossSpring.t = arg1
+	tbl_4_upvr.CrossSpring.s = arg2
+	tbl_4_upvr.CrossSpring.d = arg3
+end
+function Random2DDirection(arg1, arg2, arg3) -- Line 484
+	return Vector2.new(arg2, arg3) * (arg1 or 1)
+end
+local function _(arg1, arg2) -- Line 488, Named "AddressTableValue"
+	--[[ Upvalues[2]:
+		[1]: var628_upvw (read and write)
+		[2]: var629_upvw (read and write)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	local var671
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	local ChargeAlterTable_2 = arg2.ChargeAlterTable
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [11] 9. Error Block 24 start (CF ANALYSIS FAILED)
+	local function INLINED_32() -- Internal function, doesn't exist in bytecode
+		var671 = ChargeAlterTable_2.Level1
+		return var671
+	end
+	local function INLINED_33() -- Internal function, doesn't exist in bytecode
+		var671 = ChargeAlterTable_2.Level2
+		return var671
+	end
+	local function INLINED_34() -- Internal function, doesn't exist in bytecode
+		var671 = ChargeAlterTable_2.Level3
+		return var671
+	end
+	if var629_upvw.ChargeLevel ~= 1 or not INLINED_32() or var629_upvw.ChargeLevel ~= 2 or not INLINED_33() or var629_upvw.ChargeLevel ~= 3 or not INLINED_34() then
+		var671 = arg2[arg1]
+		if not var671 then
+			-- KONSTANTERROR: [37] 26. Error Block 14 start (CF ANALYSIS FAILED)
+			var671 = arg2[arg1]
+			-- KONSTANTERROR: [37] 26. Error Block 14 end (CF ANALYSIS FAILED)
+		end
+	end
+	do
+		return var671
+	end
+	-- KONSTANTERROR: [11] 9. Error Block 24 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [39] 28. Error Block 19 start (CF ANALYSIS FAILED)
+	do
+		return arg2[arg1]
+	end
+	-- KONSTANTERROR: [39] 28. Error Block 19 end (CF ANALYSIS FAILED)
+end
+local function _() -- Line 497, Named "CanShoot"
+	--[[ Upvalues[8]:
+		[1]: module_upvr (readonly)
+		[2]: var627_upvw (read and write)
+		[3]: Parent_upvr (readonly)
+		[4]: Humanoid_upvr_2 (readonly)
+		[5]: var629_upvw (read and write)
+		[6]: var628_upvw (read and write)
+		[7]: var629_upvw (read and write)
+		[8]: tbl_6_upvr (readonly)
+	]]
+	if module_upvr[var627_upvw] ~= nil then
+		return module_upvr[var627_upvw](Parent_upvr, Humanoid_upvr_2, var629_upvw.Heat, var628_upvw.MaxHeat, var629_upvw.Mag, var628_upvw.AmmoPerMag, var629_upvw.Ammo, var629_upvw.MaxAmmo, tbl_6_upvr.ShootCounts, tbl_6_upvr.CurrentFireRate)
+	end
+	return true
+end
+local CollectionService_upvr = game:GetService("CollectionService")
+local any_Wait_result1_upvw = LocalPlayer_upvr.CharacterAdded:Wait()
+local function PopulateHumanoids_upvr() -- Line 504, Named "PopulateHumanoids"
+	--[[ Upvalues[4]:
+		[1]: CollectionService_upvr (readonly)
+		[2]: any_Wait_result1_upvw (read and write)
+		[3]: DamageModule_upvr (readonly)
+		[4]: var628_upvw (read and write)
+	]]
+	for _, v_13 in pairs(CollectionService_upvr:GetTagged("Humanoids")) do
+		if v_13.Parent ~= any_Wait_result1_upvw and DamageModule_upvr.CanDamage(v_13.Parent, any_Wait_result1_upvw, var628_upvw.FriendlyFire) then
+			table.insert(Humanoids, v_13)
+		end
+	end
+end
+local function CastRay_upvr(arg1, arg2, arg3, arg4, arg5, arg6, arg7) -- Line 512, Named "CastRay"
+	--[[ Upvalues[6]:
+		[1]: Parent_upvr (readonly)
+		[2]: CloneTable_upvr (readonly)
+		[3]: var628_upvw (read and write)
+		[4]: Workspace_upvr (readonly)
+		[5]: DamageModule_upvr (readonly)
+		[6]: any_Wait_result1_upvw (read and write)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	-- KONSTANTERROR: [0] 1. Error Block 30 start (CF ANALYSIS FAILED)
+	debug.profilebegin("CastRay_(GunClient_"..Parent_upvr.Name..')')
+	if arg1 ~= "Beam" then
+	end
+	-- KONSTANTERROR: [0] 1. Error Block 30 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [105] 84. Error Block 26 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [105] 84. Error Block 26 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [30] 25. Error Block 40 start (CF ANALYSIS FAILED)
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.2166692]
+	if 0 < arg3 * arg4 and nil then
+		-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.16]
+		if nil then
+		end
+		if arg7 then
+			-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+			if nil then
+				-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+				if arg7 == nil then
+				else
+				end
+			end
+		end
+		-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.19]
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+		-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.18]
+		local function INLINED_35() -- Internal function, doesn't exist in bytecode
+			-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+			return nil
+		end
+		local function INLINED_36() -- Internal function, doesn't exist in bytecode
+			-- KONSTANTERROR: Expression was reused, decompilation is incorrect (x2)
+			return nil <= nil
+		end
+		local function INLINED_37() -- Internal function, doesn't exist in bytecode
+			-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+			return nil
+		end
+		local function INLINED_38() -- Internal function, doesn't exist in bytecode
+			-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [105.17]
+			return nil
+		end
+		if nil < nil or nil == "Handle" or INLINED_35() and (INLINED_36() or not INLINED_37() or false) or INLINED_38() then
+			-- KONSTANTWARNING: GOTO [105] #84
+		end
+		-- KONSTANTWARNING: GOTO [106] #85
+	end
+	-- KONSTANTERROR: [30] 25. Error Block 40 end (CF ANALYSIS FAILED)
+end
+local function _(arg1, arg2) -- Line 555, Named "Get3DPosition"
+	--[[ Upvalues[3]:
+		[1]: CurrentCamera_upvr (readonly)
+		[2]: CastRay_upvr (readonly)
+		[3]: tbl_36_upvr (readonly)
+	]]
+	local any_ScreenPointToRay_result1 = CurrentCamera_upvr:ScreenPointToRay(arg2.X, arg2.Y, 1000)
+	local _, CastRay_result2_3, _, _ = CastRay_upvr(arg1, CurrentCamera_upvr.CFrame.p, (any_ScreenPointToRay_result1.Origin + any_ScreenPointToRay_result1.Direction - CurrentCamera_upvr.CFrame.p).Unit, 1000, tbl_36_upvr, true)
+	return CastRay_result2_3
+end
+local function Get3DPosition2_upvr() -- Line 562, Named "Get3DPosition2"
+	--[[ Upvalues[8]:
+		[1]: var628_upvw (read and write)
+		[2]: var592_2_upvr (readonly)
+		[3]: var669_upvr (readonly)
+		[4]: CurrentCamera_upvr (readonly)
+		[5]: CastRay_upvr (readonly)
+		[6]: tbl_36_upvr (readonly)
+		[7]: SOME_8_upvw (read and write)
+		[8]: var627_upvw (read and write)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 26 start (CF ANALYSIS FAILED)
+	local var686
+	if var628_upvw.LaserBeam then
+		var686 = "Beam"
+	else
+		var686 = "Tip"
+	end
+	-- KONSTANTERROR: [0] 1. Error Block 26 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 6 start (CF ANALYSIS FAILED)
+	local AbsolutePosition_5 = var669_upvr.Crosshair.Center.AbsolutePosition
+	local any_ScreenPointToRay_result1_4 = CurrentCamera_upvr:ScreenPointToRay(AbsolutePosition_5.X, AbsolutePosition_5.Y, 1000)
+	local _, CastRay_result2_2, _, _ = CastRay_upvr(var686, CurrentCamera_upvr.CFrame.p, (any_ScreenPointToRay_result1_4.Origin + any_ScreenPointToRay_result1_4.Direction - CurrentCamera_upvr.CFrame.p).Unit, 1000, tbl_36_upvr, true)
+	do
+		return CastRay_result2_2
+	end
+	-- KONSTANTERROR: [12] 10. Error Block 6 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [54] 39. Error Block 7 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [54] 39. Error Block 7 end (CF ANALYSIS FAILED)
+end
+local function CheckPartInScanner_upvr(arg1) -- Line 594, Named "CheckPartInScanner"
+	--[[ Upvalues[2]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: CurrentCamera_upvr (readonly)
+	]]
+	if arg1 and tbl_6_upvr.Radar then
+		local any_WorldToScreenPoint_result1_3, any_WorldToScreenPoint_result2_3 = CurrentCamera_upvr:WorldToScreenPoint(arg1.Position)
+		if any_WorldToScreenPoint_result2_3 then
+			local AbsoluteSize = tbl_6_upvr.Radar.AbsoluteSize
+			local AbsolutePosition_3 = tbl_6_upvr.Radar.AbsolutePosition
+			local var697 = false
+			if AbsolutePosition_3.X < any_WorldToScreenPoint_result1_3.X then
+				var697 = false
+				if AbsolutePosition_3.Y < any_WorldToScreenPoint_result1_3.Y then
+					var697 = false
+					if any_WorldToScreenPoint_result1_3.X < AbsolutePosition_3.X + AbsoluteSize.X then
+						if any_WorldToScreenPoint_result1_3.Y >= AbsolutePosition_3.Y + AbsoluteSize.Y then
+							var697 = false
+						else
+							var697 = true
+						end
+					end
+				end
+			end
+			return var697
+		end
+	end
+	return false
+end
+local function _(arg1, arg2) -- Line 606, Named "CheckForLockedTarget"
+	local var705
+	for _, v_14 in pairs(arg2) do
+		if v_14 and v_14.TargetEntity == arg1 then
+			var705 = true
+			return var705
+		end
+	end
+	return var705
+end
+local Head_upvr = LocalPlayer_upvr.CharacterAdded:Wait():WaitForChild("Head")
+local function FindNearestEntity_upvr(arg1) -- Line 617, Named "FindNearestEntity"
+	--[[ Upvalues[9]:
+		[1]: PopulateHumanoids_upvr (readonly)
+		[2]: var628_upvw (read and write)
+		[3]: Head_upvr (readonly)
+		[4]: CheckPartInScanner_upvr (readonly)
+		[5]: Get3DPosition2_upvr (readonly)
+		[6]: CastRay_upvr (readonly)
+		[7]: tbl_36_upvr (readonly)
+		[8]: DamageModule_upvr (readonly)
+		[9]: any_Wait_result1_upvw (read and write)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	Humanoids = {} -- Setting global
+	PopulateHumanoids_upvr()
+	local var707
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [102] 75. Error Block 91 start (CF ANALYSIS FAILED)
+	local function INLINED_39() -- Internal function, doesn't exist in bytecode
+		var707 = {}
+		return var707
+	end
+	if arg1 == nil or not INLINED_39() then
+		var707 = Humanoids
+	end
+	local _, _, _ = ipairs(var707)
+	-- KONSTANTERROR: [102] 75. Error Block 91 end (CF ANALYSIS FAILED)
+end
+local function _(arg1) -- Line 682, Named "GetInstanceFromAncestor"
+	--[[ Upvalues[2]:
+		[1]: Parent_upvr (readonly)
+		[2]: any_Wait_result1_upvw (read and write)
+	]]
+	if arg1[1] == "Tool" then
+		return Parent_upvr:FindFirstChild(arg1[2], true)
+	end
+	if arg1[1] ~= "Character" then return end
+	return any_Wait_result1_upvw:FindFirstChild(arg1[2], true)
+end
+function SetCustomGrip(arg1) -- Line 692
+	--[[ Upvalues[5]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var592_2_upvr (readonly)
+		[3]: Parent_upvr (readonly)
+		[4]: any_Wait_result1_upvw (read and write)
+		[5]: RightHand_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [240] 166. Error Block 49 start (CF ANALYSIS FAILED)
+	do
+		return
+	end
+	-- KONSTANTERROR: [240] 166. Error Block 49 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [241] 167. Error Block 73 start (CF ANALYSIS FAILED)
+	local var713 = tbl_6_upvr
+	var713.GripId += 1
+	for _, v_15 in ipairs(tbl_6_upvr.Motor6DInstances) do
+		if v_15 then
+			v_15.Part0 = nil
+			v_15.Part1 = nil
+			v_15.CurrentAngle = 0
+			v_15.DesiredAngle = 0
+		end
+	end
+	table.clear(tbl_6_upvr.Motor6DInstances)
+	tbl_6_upvr.DefaultC0 = nil
+	tbl_6_upvr.DefaultC1 = nil
+	-- KONSTANTERROR: [241] 167. Error Block 73 end (CF ANALYSIS FAILED)
+end
+function UpdateGUI() -- Line 759
+	--[[ Upvalues[8]:
+		[1]: var628_upvw (read and write)
+		[2]: var669_upvr (readonly)
+		[3]: var629_upvw (read and write)
+		[4]: var629_upvw (read and write)
+		[5]: var592_2_upvr (readonly)
+		[6]: tbl_6_upvr (readonly)
+		[7]: UserInputService_upvr (readonly)
+		[8]: tbl_21_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 108 start (CF ANALYSIS FAILED)
+	local var717
+	if var628_upvw.AmmoPerMag ~= math.huge then
+		var717 = var628_upvw
+		if var717.MaxHeat ~= math.huge then
+			var717 = var669_upvr.Frame
+			var717 = true
+			var717.Counter.Visible = var717
+		end
+	end
+	var717 = var669_upvr.Frame.Counter.Mag
+	var717.Fill:TweenSize(UDim2.new(var629_upvw.Mag / var628_upvw.AmmoPerMag, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.25, true)
+	var717 = var669_upvr.Frame.Counter.Ammo
+	var717.Fill:TweenSize(UDim2.new(var629_upvw.Ammo / var629_upvw.MaxAmmo, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.25, true)
+	var717 = var669_upvr.Frame.Counter.Heat
+	var717.Fill:TweenSize(UDim2.new(var629_upvw.Heat / var628_upvw.MaxHeat, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quint, 0.25, true)
+	var717 = var669_upvr.Frame.Counter.Mag
+	var717 = var629_upvw.Mag
+	var717.Current.Text = var717
+	var717 = var669_upvr.Frame.Counter.Mag
+	var717 = var628_upvw.AmmoPerMag
+	var717.Max.Text = var717
+	var717 = var669_upvr.Frame.Counter.Ammo
+	var717 = var629_upvw.Ammo
+	var717.Current.Text = var717
+	var717 = var669_upvr.Frame.Counter.Ammo
+	var717 = var629_upvw.MaxAmmo
+	var717.Max.Text = var717
+	var717 = var669_upvr.Frame.Counter.Heat
+	var717 = var629_upvw.Heat
+	var717.Current.Text = var717
+	var717 = var669_upvr.Frame.Counter.Heat
+	var717 = var628_upvw.MaxHeat
+	var717.Max.Text = var717
+	var717 = var669_upvr.Frame.FireMode
+	var717 = var592_2_upvr.AltFire
+	if var717 then
+		if var628_upvw.AltName == "" then
+			var717 = false
+		else
+			var717 = true
+		end
+	end
+	var717.Alternative.Visible = var717
+	var669_upvr.Frame.FireMode.Alternative.Text = var628_upvw.AltName
+	if var628_upvw.SelectiveFireEnabled then
+		if var628_upvw.FireModeTexts[var629_upvw.FireMode] == "" then
+		else
+		end
+	end
+	var669_upvr.Frame.FireMode.Selective.Visible = true
+	var669_upvr.Frame.FireMode.Selective.Text = var628_upvw.FireModeTexts[var629_upvw.FireMode]
+	var669_upvr.Frame.Counter.Mag.Current.Visible = not tbl_6_upvr.Reloading
+	var669_upvr.Frame.Counter.Mag.Max.Visible = not tbl_6_upvr.Reloading
+	var669_upvr.Frame.Counter.Mag.Frame.Visible = not tbl_6_upvr.Reloading
+	var669_upvr.Frame.Counter.Mag.Reloading.Visible = tbl_6_upvr.Reloading
+	if var629_upvw.Ammo > 0 then
+		-- KONSTANTWARNING: GOTO [343] #215
+	end
+	var669_upvr.Frame.Counter.Ammo.Current.Visible = not true
+	if var629_upvw.Ammo > 0 then
+		-- KONSTANTWARNING: GOTO [363] #228
+	end
+	var669_upvr.Frame.Counter.Ammo.Max.Visible = not true
+	if var629_upvw.Ammo > 0 then
+		-- KONSTANTWARNING: GOTO [383] #241
+	end
+	var669_upvr.Frame.Counter.Ammo.Frame.Visible = not true
+	if var629_upvw.Ammo > 0 then
+	else
+	end
+	var669_upvr.Frame.Counter.Ammo.NoMoreAmmo.Visible = true
+	var669_upvr.Frame.Counter.Heat.Visible = var628_upvw.BatteryEnabled
+	var669_upvr.Frame.Counter.Heat.Current.Visible = not tbl_6_upvr.Overheated
+	var669_upvr.Frame.Counter.Heat.Max.Visible = not tbl_6_upvr.Overheated
+	var669_upvr.Frame.Counter.Heat.Frame.Visible = not tbl_6_upvr.Overheated
+	var669_upvr.Frame.Counter.Heat.Overheated.Visible = tbl_6_upvr.Overheated
+	-- KONSTANTERROR: [0] 1. Error Block 108 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [483] 302. Error Block 31 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [483] 302. Error Block 31 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [487] 305. Error Block 32 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [487] 305. Error Block 32 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [491] 308. Error Block 33 start (CF ANALYSIS FAILED)
+	var669_upvr.ChargeBar.Visible = not var628_upvw.LockOnScan
+	-- KONSTANTERROR: [491] 308. Error Block 33 end (CF ANALYSIS FAILED)
+end
+local mouse_upvr = LocalPlayer_upvr:GetMouse()
+local var719_upvr = GunGUI_2.AbsoluteSize.Y + vector2_upvr.Y + 100
+function Render(arg1) -- Line 828
+	--[[ Upvalues[19]:
+		[1]: tbl_4_upvr (readonly)
+		[2]: UserInputService_upvr (readonly)
+		[3]: var669_upvr (readonly)
+		[4]: mouse_upvr (readonly)
+		[5]: CurrentCamera_upvr (readonly)
+		[6]: var628_upvw (read and write)
+		[7]: tbl_6_upvr (readonly)
+		[8]: var592_2_upvr (readonly)
+		[9]: SOME_8_upvw (read and write)
+		[10]: var627_upvw (read and write)
+		[11]: var629_upvw (read and write)
+		[12]: FindNearestEntity_upvr (readonly)
+		[13]: var586_upvw (read and write)
+		[14]: TargetMarker_upvr_2 (readonly)
+		[15]: Get3DPosition2_upvr (readonly)
+		[16]: ProjectileMotion_upvr (readonly)
+		[17]: LocalPlayer_upvr (readonly)
+		[18]: var719_upvr (readonly)
+		[19]: var630_upvw (read and write)
+	]]
+	-- KONSTANTERROR: Failed to generate AST for function `Render`:
+assertion failed!
+Traceback:
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+
+end
+function SetAnimationTrack(arg1, arg2, arg3, arg4, arg5) -- Line 1009
+	--[[ Upvalues[7]:
+		[1]: var630_upvw (read and write)
+		[2]: var639_upvw (read and write)
+		[3]: var641_upvw (read and write)
+		[4]: var643_upvw (read and write)
+		[5]: var645_upvw (read and write)
+		[6]: var647_upvw (read and write)
+		[7]: var629_upvw (read and write)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 45 start (CF ANALYSIS FAILED)
+	if arg1 == "AimFireAnim" then
+		-- KONSTANTWARNING: GOTO [38] #29
+	end
+	-- KONSTANTERROR: [0] 1. Error Block 45 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [6] 6. Error Block 44 start (CF ANALYSIS FAILED)
+	if arg1 == "FireAnim" then
+		-- KONSTANTWARNING: GOTO [38] #29
+	end
+	-- KONSTANTERROR: [6] 6. Error Block 44 end (CF ANALYSIS FAILED)
+end
+function SetFireSoundLoopEnabled(arg1, arg2) -- Line 1043
+	--[[ Upvalues[5]:
+		[1]: var628_upvw (read and write)
+		[2]: SOME_8_upvw (read and write)
+		[3]: var627_upvw (read and write)
+		[4]: var629_upvw (read and write)
+		[5]: gunEvent_upvr_2 (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	local ShouldLoop = var628_upvw.ShouldLoop
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [53] 37. Error Block 25 start (CF ANALYSIS FAILED)
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [55.4]
+	local FireSound_2 = ShouldLoop:FindFirstChild(nil):FindFirstChild("FireSound")
+	if FireSound_2 and FireSound_2:IsA("Sound") then
+		local tbl_33 = {
+			Instance = FireSound_2;
+			Origin = SOME_8_upvw:FindFirstChild("GunMuzzlePoint"..var627_upvw);
+			Echo = var628_upvw.EchoEffect;
+			Silenced = var628_upvw.SilenceEffect;
+		}
+		local tbl_10 = {}
+		tbl_10.Enabled = arg2
+		tbl_10.Id = arg1
+		tbl_33.LoopData = tbl_10
+		gunEvent_upvr_2:Fire("PlayAudio", tbl_33, nil, true)
+	end
+	-- KONSTANTERROR: [53] 37. Error Block 25 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [102] 72. Error Block 23 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [102] 72. Error Block 23 end (CF ANALYSIS FAILED)
+end
+function VisibleMuzz(arg1, arg2) -- Line 1062
+	--[[ Upvalues[1]:
+		[1]: Thread_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	local pairs_result1_2, pairs_result2_16, pairs_result3_13 = pairs(arg1:GetChildren())
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [27] 21. Error Block 7 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [27] 21. Error Block 7 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [7] 6. Error Block 11 start (CF ANALYSIS FAILED)
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [27.7]
+	if nil == "ParticleEmitter" then
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+		if nil then
+			if arg2 then
+				-- KONSTANTWARNING: GOTO [27] #21
+			end
+		else
+		end
+	end
+	-- KONSTANTERROR: [7] 6. Error Block 11 end (CF ANALYSIS FAILED)
+end
+function MarkHit(arg1, arg2) -- Line 1078
+	--[[ Upvalues[3]:
+		[1]: var669_upvr (readonly)
+		[2]: TweenService_upvr_2 (readonly)
+		[3]: Debris_upvr_2 (readonly)
+	]]
+	local var727
+	if arg1.HitmarkerEnabled then
+		if arg2 then
+			var727 = var669_upvr.Crosshair
+			var727 = arg1.HitmarkerColorHS
+			var727.Hitmarker.ImageColor3 = var727
+			var727 = var669_upvr.Crosshair
+			var727 = 0
+			var727.Hitmarker.ImageTransparency = var727
+			TweenService_upvr_2:Create(var669_upvr.Crosshair.Hitmarker, TweenInfo.new(arg1.HitmarkerFadeTimeHS, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+				ImageTransparency = 1;
+			}):Play()
+		else
+			var727 = var669_upvr.Crosshair
+			var727 = arg1.HitmarkerColor
+			var727.Hitmarker.ImageColor3 = var727
+			var727 = var669_upvr.Crosshair
+			var727 = 0
+			var727.Hitmarker.ImageTransparency = var727
+			TweenService_upvr_2:Create(var669_upvr.Crosshair.Hitmarker, TweenInfo.new(arg1.HitmarkerFadeTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+				ImageTransparency = 1;
+			}):Play()
+		end
+		var727 = var669_upvr.Crosshair
+		local clone_8 = var727.MarkerSound:Clone()
+		var727 = "MarkerSoundClone"
+		clone_8.Name = var727
+		var727 = "rbxassetid://"..arg1.HitmarkerSoundIDs[math.random(1, #arg1.HitmarkerSoundIDs)]
+		clone_8.SoundId = var727
+		local function INLINED_40() -- Internal function, doesn't exist in bytecode
+			var727 = arg1.HitmarkerSoundPitchHS
+			return var727
+		end
+		if not arg2 or not INLINED_40() then
+			var727 = arg1.HitmarkerSoundPitch
+		end
+		clone_8.PlaybackSpeed = var727
+		var727 = var669_upvr.Crosshair
+		clone_8.Parent = var727
+		var727 = clone_8:Play
+		var727()
+		var727 = Debris_upvr_2:AddItem
+		var727(clone_8, 1)
+	end
+end
+function EjectShell(arg1, arg2) -- Line 1099
+	--[[ Upvalues[9]:
+		[1]: var628_upvw (read and write)
+		[2]: var629_upvw (read and write)
+		[3]: var627_upvw (read and write)
+		[4]: GunVisualEffects_upvr_2 (readonly)
+		[5]: Thread_upvr (readonly)
+		[6]: Debris_upvr_2 (readonly)
+		[7]: any_Wait_result1_upvw (read and write)
+		[8]: Miscs_upvr_2 (readonly)
+		[9]: CurrentCamera_upvr (readonly)
+	]]
+	-- KONSTANTERROR: Failed to generate AST for function `EjectShell`:
+assertion failed!
+Traceback:
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+
+end
+function CreateCasing(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 1160
+	--[[ Upvalues[6]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var592_2_upvr (readonly)
+		[3]: vector2_upvr (readonly)
+		[4]: var669_upvr (readonly)
+		[5]: Thread_upvr (readonly)
+		[6]: TweenService_upvr_2 (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 37 start (CF ANALYSIS FAILED)
+	local var731
+	if var592_2_upvr.MaxCount > tbl_6_upvr.CasingCount then
+		var731 = false
+	else
+		var731 = true
+	end
+	-- KONSTANTERROR: [0] 1. Error Block 37 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [11] 9. Error Block 5 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [11] 9. Error Block 5 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [15] 12. Error Block 6 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [15] 12. Error Block 6 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [65] 48. Error Block 34 start (CF ANALYSIS FAILED)
+	if not var731 then
+		tbl_6_upvr.CasingCount += 1
+		local var732_upvr = arg2.X + arg3.X / 2
+		local var733_upvr = arg2.Y + arg3.Y / 2
+		local tbl_30 = {
+			RotVel = (math.random() * 2 - 1) * var592_2_upvr.MaxRotationSpeed;
+		}
+		tbl_30.Rot = arg1
+		if not arg2 or not Vector2.new(var732_upvr, var733_upvr) then
+		end
+		tbl_30.Pos = Vector2.new(0, 0) + vector2_upvr
+		local var735 = arg4
+		if not var735 then
+			var735 = Vector2.new(0, 0)
+		end
+		tbl_30.Vel = var735
+		var735 = var669_upvr.MagCartridge.UIGridLayout.Shell
+		local var736 = var735
+		if arg5 == "Bullet" then
+			var736 = var669_upvr.MagCartridge.UIGridLayout.Template
+		end
+		local clone = var736:Clone()
+		clone.Rotation = arg1
+		tbl_6_upvr.Casings[clone] = tbl_30
+		clone.Parent = var669_upvr
+		if arg6 then
+			Thread_upvr:Spawn(function() -- Line 1196
+				--[[ Upvalues[4]:
+					[1]: var669_upvr (copied, readonly)
+					[2]: var732_upvr (readonly)
+					[3]: var733_upvr (readonly)
+					[4]: TweenService_upvr_2 (copied, readonly)
+				]]
+				local clone_7 = var669_upvr.MagCartridge.UIGridLayout.Shockwave:Clone()
+				clone_7.Position = UDim2.new(0, var732_upvr, 0, var733_upvr)
+				clone_7.Rotation = math.deg(math.rad(math.random(360)))
+				clone_7.Parent = var669_upvr
+				local any_Create_result1 = TweenService_upvr_2:Create(clone_7, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+					Size = UDim2.new(0, 50, 0, 50);
+					ImageTransparency = 1;
+				})
+				any_Create_result1:Play()
+				any_Create_result1.Completed:Wait()
+				clone_7:Destroy()
+			end)
+		end
+	end
+	-- KONSTANTERROR: [65] 48. Error Block 34 end (CF ANALYSIS FAILED)
+end
+local module_upvr_2 = require(Setting_upvr_2:WaitForChild("OnClientShootEvents"))
+local Math_upvr = Utilities.Math
+local UpperTorso_upvr = LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("UpperTorso")
+function Fire(arg1, arg2, arg3, arg4, arg5, arg6, arg7) -- Line 1211
+	--[[ Upvalues[28]:
+		[1]: var629_upvw (read and write)
+		[2]: var628_upvw (read and write)
+		[3]: tbl_6_upvr (readonly)
+		[4]: var643_upvw (read and write)
+		[5]: var639_upvw (read and write)
+		[6]: var644_upvw (read and write)
+		[7]: var641_upvw (read and write)
+		[8]: var640_upvw (read and write)
+		[9]: var645_upvw (read and write)
+		[10]: var646_upvw (read and write)
+		[11]: var642_upvw (read and write)
+		[12]: var627_upvw (read and write)
+		[13]: gunEvent_upvr_2 (readonly)
+		[14]: var586_upvw (read and write)
+		[15]: Parent_upvr (readonly)
+		[16]: module_upvr_2 (readonly)
+		[17]: any_Wait_result1_upvw (read and write)
+		[18]: Thread_upvr (readonly)
+		[19]: Math_upvr (readonly)
+		[20]: tbl_4_upvr (readonly)
+		[21]: Humanoid_upvr_2 (readonly)
+		[22]: UpperTorso_upvr (readonly)
+		[23]: Debris_upvr_2 (readonly)
+		[24]: var629_upvw (read and write)
+		[25]: var592_2_upvr (readonly)
+		[26]: var669_upvr (readonly)
+		[27]: ChangeMagAndAmmo_upvr_2 (readonly)
+		[28]: var630_upvw (read and write)
+	]]
+	-- KONSTANTERROR: Failed to generate AST for function `Fire`:
+assertion failed!
+Traceback:
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+
+end
+function CycleHandles() -- Line 1413
+	--[[ Upvalues[15]:
+		[1]: var629_upvw (read and write)
+		[2]: var628_upvw (read and write)
+		[3]: SOME_8_upvw (read and write)
+		[4]: Parent_upvr (readonly)
+		[5]: var630_upvw (read and write)
+		[6]: var639_upvw (read and write)
+		[7]: var640_upvw (read and write)
+		[8]: var641_upvw (read and write)
+		[9]: var642_upvw (read and write)
+		[10]: var643_upvw (read and write)
+		[11]: var644_upvw (read and write)
+		[12]: var645_upvw (read and write)
+		[13]: var646_upvw (read and write)
+		[14]: var647_upvw (read and write)
+		[15]: var648_upvw (read and write)
+	]]
+	var629_upvw.HandleIndex = var629_upvw.HandleIndex % #var628_upvw.Handles + 1
+	SOME_8_upvw = Parent_upvr:FindFirstChild(var628_upvw.Handles[var629_upvw.HandleIndex], true)
+	if 0 < #var630_upvw.AimFireAnims then
+		var629_upvw.AimFireAnimIndex = var629_upvw.AimFireAnimIndex % #var630_upvw.AimFireAnims + 1
+		var639_upvw = var630_upvw.AimFireAnims[var629_upvw.AimFireAnimIndex][1]
+		var640_upvw = var630_upvw.AimFireAnims[var629_upvw.AimFireAnimIndex][2]
+	end
+	if 0 < #var630_upvw.FireAnims then
+		var629_upvw.FireAnimIndex = var629_upvw.FireAnimIndex % #var630_upvw.FireAnims + 1
+		var641_upvw = var630_upvw.FireAnims[var629_upvw.FireAnimIndex][1]
+		var642_upvw = var630_upvw.FireAnims[var629_upvw.FireAnimIndex][2]
+	end
+	if 0 < #var630_upvw.AimLastFireAnims then
+		var629_upvw.AimLastFireAnimIndex = var629_upvw.AimLastFireAnimIndex % #var630_upvw.AimLastFireAnims + 1
+		var643_upvw = var630_upvw.AimLastFireAnims[var629_upvw.AimLastFireAnimIndex][1]
+		var644_upvw = var630_upvw.AimLastFireAnims[var629_upvw.AimLastFireAnimIndex][2]
+	end
+	if 0 < #var630_upvw.LastFireAnims then
+		var629_upvw.LastFireAnimIndex = var629_upvw.LastFireAnimIndex % #var630_upvw.LastFireAnims + 1
+		var645_upvw = var630_upvw.LastFireAnims[var629_upvw.LastFireAnimIndex][1]
+		var646_upvw = var630_upvw.LastFireAnims[var629_upvw.LastFireAnimIndex][2]
+	end
+	if 0 < #var630_upvw.ShotgunPumpinAnims then
+		var629_upvw.ShotgunPumpinAnimIndex = var629_upvw.ShotgunPumpinAnimIndex % #var630_upvw.ShotgunPumpinAnims + 1
+		var647_upvw = var630_upvw.ShotgunPumpinAnims[var629_upvw.ShotgunPumpinAnimIndex][1]
+		var648_upvw = var630_upvw.ShotgunPumpinAnims[var629_upvw.ShotgunPumpinAnimIndex][2]
+	end
+end
+function SetADS(arg1) -- Line 1444
+	--[[ Upvalues[13]:
+		[1]: var628_upvw (read and write)
+		[2]: tbl_6_upvr (readonly)
+		[3]: TweenService_upvr_2 (readonly)
+		[4]: CurrentCamera_upvr (readonly)
+		[5]: tbl_4_upvr (readonly)
+		[6]: var630_upvw (read and write)
+		[7]: var629_upvw (read and write)
+		[8]: UserInputService_upvr (readonly)
+		[9]: var631_upvw (read and write)
+		[10]: LocalPlayer_upvr (readonly)
+		[11]: var592_2_upvr (readonly)
+		[12]: Thread_upvr (readonly)
+		[13]: var669_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	do
+		return
+	end
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [5] 5. Error Block 3 start (CF ANALYSIS FAILED)
+	local var745_upvw
+	local function _() -- Line 1449, Named "Disable"
+		--[[ Upvalues[11]:
+			[1]: tbl_6_upvr (copied, readonly)
+			[2]: var745_upvw (read and write)
+			[3]: var628_upvw (copied, read and write)
+			[4]: TweenService_upvr_2 (copied, readonly)
+			[5]: CurrentCamera_upvr (copied, readonly)
+			[6]: tbl_4_upvr (copied, readonly)
+			[7]: var630_upvw (copied, read and write)
+			[8]: var629_upvw (copied, read and write)
+			[9]: UserInputService_upvr (copied, readonly)
+			[10]: var631_upvw (copied, read and write)
+			[11]: LocalPlayer_upvr (copied, readonly)
+		]]
+		if not tbl_6_upvr.AimDown then
+		else
+			var745_upvw = TweenInfo.new(var628_upvw.TweenLengthNAD, var628_upvw.EasingStyleNAD, var628_upvw.EasingDirectionNAD)
+			TweenService_upvr_2:Create(CurrentCamera_upvr, var745_upvw, {
+				FieldOfView = 70;
+			}):Play()
+			tbl_4_upvr.CrossScale.t = 1
+			if tbl_6_upvr.ActuallyEquipped then
+				SetAnimationTrack("AimIdleAnim", "Stop")
+				SetAnimationTrack("EmptyAimIdleAnim", "Stop")
+				if var630_upvw.EmptyIdleAnim and var629_upvw.Mag <= 0 then
+					SetAnimationTrack("EmptyIdleAnim", "Play", var628_upvw.EmptyIdleAnimationSpeed)
+				else
+					SetAnimationTrack("IdleAnim", "Play", var628_upvw.IdleAnimationSpeed)
+				end
+			end
+			UserInputService_upvr.MouseDeltaSensitivity = tbl_6_upvr.InitialSensitivity
+			tbl_6_upvr.AimDown = false
+			if var628_upvw.UseAimpoint then
+				_G.SetAimEnabled(false, 1, TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out))
+			end
+			tbl_6_upvr.Scoping = false
+			if var628_upvw.HideCrosshair then
+				TweenService_upvr_2:Create(var631_upvw, var745_upvw, {
+					GroupTransparency = 0;
+				}):Play()
+			end
+			LocalPlayer_upvr.CameraMode = Enum.CameraMode.Classic
+		end
+	end
+	-- KONSTANTERROR: [5] 5. Error Block 3 end (CF ANALYSIS FAILED)
+end
+function SetChargeEffect(arg1, arg2) -- Line 1522
+	--[[ Upvalues[4]:
+		[1]: gunEvent_upvr_2 (readonly)
+		[2]: any_Wait_result1_upvw (read and write)
+		[3]: Parent_upvr (readonly)
+		[4]: SOME_8_upvw (read and write)
+	]]
+	gunEvent_upvr_2:Fire("VisualizeCharge", arg2, "Begin", any_Wait_result1_upvw, Parent_upvr, SOME_8_upvw, arg1, true)
+end
+function RemoveStuff(arg1) -- Line 1526
+	--[[ Upvalues[7]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var586_upvw (read and write)
+		[3]: TargetMarker_upvr_2 (readonly)
+		[4]: var630_upvw (read and write)
+		[5]: var628_upvw (read and write)
+		[6]: Parent_upvr (readonly)
+		[7]: var627_upvw (read and write)
+	]]
+	for i_17, v_16 in pairs(tbl_6_upvr.KeyframeConnections) do
+		v_16:Disconnect()
+		table.remove(tbl_6_upvr.KeyframeConnections, i_17)
+	end
+	var586_upvw = nil
+	TargetMarker_upvr_2.Enabled = false
+	TargetMarker_upvr_2.Parent = script
+	TargetMarker_upvr_2.Adornee = nil
+	if tbl_6_upvr.Radar then
+		tbl_6_upvr.Radar:Destroy()
+		tbl_6_upvr.Radar = nil
+	end
+	if tbl_6_upvr.Beam then
+		tbl_6_upvr.Beam:Destroy()
+		tbl_6_upvr.Beam = nil
+	end
+	if tbl_6_upvr.Attach0 then
+		tbl_6_upvr.Attach0:Destroy()
+		tbl_6_upvr.Attach0 = nil
+	end
+	if tbl_6_upvr.Attach1 then
+		tbl_6_upvr.Attach1:Destroy()
+		tbl_6_upvr.Attach1 = nil
+	end
+	for i_18, v_17 in pairs(var630_upvw) do
+		if typeof(v_17) == "table" then
+			for _, v_18 in pairs(v_17) do
+				if v_18[1].IsPlaying then
+					v_18[1]:Stop()
+				end
+			end
+		elseif v_17.IsPlaying then
+			v_17:Stop()
+		end
+	end
+	if arg1 then
+		i_18 = var628_upvw
+		for _, v_19 in pairs(i_18.Handles) do
+			local SOME_2 = Parent_upvr:FindFirstChild(v_19, true)
+			if SOME_2 then
+				for _, v_20 in pairs(SOME_2[var627_upvw]:GetChildren()) do
+					if v_20:IsA("Sound") and v_20.IsPlaying then
+						v_20:Stop()
+					end
+				end
+			end
+		end
+	end
+end
+function Overheat() -- Line 1580
+	--[[ Upvalues[9]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var629_upvw (read and write)
+		[3]: var628_upvw (read and write)
+		[4]: SOME_8_upvw (read and write)
+		[5]: var627_upvw (read and write)
+		[6]: gunEvent_upvr_2 (readonly)
+		[7]: any_Wait_result1_upvw (read and write)
+		[8]: Parent_upvr (readonly)
+		[9]: Thread_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [8] 7. Error Block 3 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [8] 7. Error Block 3 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 4 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 4 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [133] 102. Error Block 14 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [133] 102. Error Block 14 end (CF ANALYSIS FAILED)
+end
+function Reload() -- Line 1609
+	--[[ Upvalues[11]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var629_upvw (read and write)
+		[3]: var592_2_upvr (readonly)
+		[4]: var628_upvw (read and write)
+		[5]: var629_upvw (read and write)
+		[6]: var630_upvw (read and write)
+		[7]: SOME_8_upvw (read and write)
+		[8]: var627_upvw (read and write)
+		[9]: Thread_upvr (readonly)
+		[10]: var669_upvr (readonly)
+		[11]: ChangeMagAndAmmo_upvr_2 (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [8] 7. Error Block 3 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [8] 7. Error Block 3 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [18] 14. Error Block 5 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [18] 14. Error Block 5 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [22] 17. Error Block 6 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [22] 17. Error Block 6 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [26] 20. Error Block 156 start (CF ANALYSIS FAILED)
+	local Mag = var629_upvw.Mag
+	-- KONSTANTERROR: [26] 20. Error Block 156 end (CF ANALYSIS FAILED)
+	if tbl_6_upvr.ActuallyEquipped and not tbl_6_upvr.CanCancelReload then
+		if not var628_upvw.ShotgunReload then
+			if var592_2_upvr.MagCartridge and var592_2_upvr.DropAllRemainingBullets and not var628_upvw.BatteryEnabled then
+				for i_22 = 1, var629_upvw.Mag do
+					local SOME_3 = var669_upvr.MagCartridge:FindFirstChild(i_22)
+					CreateCasing(SOME_3.Rotation, SOME_3.AbsolutePosition, SOME_3.AbsoluteSize, Vector2.new(math.random(var592_2_upvr.DropXMin, var592_2_upvr.DropXMax), math.random(var592_2_upvr.DropYMin, var592_2_upvr.DropYMax)) * (var592_2_upvr.DropVelocity or 1) * math.random() ^ 0.5, "Bullet")
+				end
+			end
+			if var592_2_upvr.UniversalAmmoEnabled or var628_upvw.LimitedAmmoEnabled or var629_upvw.MaxAmmo ~= math.huge then
+				i_22 = var628_upvw.AmmoPerMag
+				i_22 = var629_upvw.Ammo
+				local minimum_2 = math.min(i_22 - var629_upvw.Mag, i_22)
+				i_22 = var629_upvw.Mag + minimum_2
+				var629_upvw.Mag = i_22
+				i_22 = var629_upvw.Ammo - minimum_2
+				var629_upvw.Ammo = i_22
+			else
+				var629_upvw.Mag = var628_upvw.AmmoPerMag
+			end
+			ChangeMagAndAmmo_upvr_2:FireServer(var627_upvw, var629_upvw.Mag, var629_upvw.Ammo)
+		end
+		Mag()
+	end
+	tbl_6_upvr.Reloading = false
+	tbl_6_upvr.CanCancelReload = false
+	if var592_2_upvr.MagCartridge and not var628_upvw.BatteryEnabled then
+		for i_23 = 1, var629_upvw.Mag do
+			var669_upvr.MagCartridge[i_23].Visible = true
+		end
+	end
+	UpdateGUI()
+	-- KONSTANTERROR: [693] 515. Error Block 122 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [693] 515. Error Block 122 end (CF ANALYSIS FAILED)
+end
+function OnIdle() -- Line 1798
+	--[[ Upvalues[4]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var630_upvw (read and write)
+		[3]: var629_upvw (read and write)
+		[4]: var628_upvw (read and write)
+	]]
+	if not tbl_6_upvr.Equipped then
+	else
+		tbl_6_upvr.HoldDown = false
+		SetAnimationTrack("HoldDownAnim", "Stop")
+		if not tbl_6_upvr.AimDown then
+			if var630_upvw.EmptyIdleAnim and var629_upvw.Mag <= 0 then
+				SetAnimationTrack("EmptyIdleAnim", "Play", var628_upvw.EmptyIdleAnimationSpeed)
+			else
+				SetAnimationTrack("IdleAnim", "Play", var628_upvw.IdleAnimationSpeed)
+			end
+		end
+		if var630_upvw.EmptyAimIdleAnim and var629_upvw.Mag <= 0 then
+			SetAnimationTrack("EmptyAimIdleAnim", "Play", var628_upvw.EmptyAimIdleAnimationSpeed)
+			return
+		end
+		SetAnimationTrack("AimIdleAnim", "Play", var628_upvw.AimIdleAnimationSpeed)
+	end
+end
+function OnWalking() -- Line 1821
+	--[[ Upvalues[4]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var630_upvw (read and write)
+		[3]: var629_upvw (read and write)
+		[4]: var628_upvw (read and write)
+	]]
+	if not tbl_6_upvr.Equipped then
+	else
+		tbl_6_upvr.HoldDown = false
+		SetAnimationTrack("HoldDownAnim", "Stop")
+		if not tbl_6_upvr.AimDown then
+			if var630_upvw.EmptyIdleAnim and var629_upvw.Mag <= 0 then
+				SetAnimationTrack("EmptyIdleAnim", "Play", var628_upvw.EmptyIdleAnimationSpeed)
+			else
+				SetAnimationTrack("IdleAnim", "Play", var628_upvw.IdleAnimationSpeed)
+			end
+		end
+		if var630_upvw.EmptyAimIdleAnim and var629_upvw.Mag <= 0 then
+			SetAnimationTrack("EmptyAimIdleAnim", "Play", var628_upvw.EmptyAimIdleAnimationSpeed)
+			return
+		end
+		SetAnimationTrack("AimIdleAnim", "Play", var628_upvw.AimIdleAnimationSpeed)
+	end
+end
+function OnRunning() -- Line 1844
+	--[[ Upvalues[2]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var628_upvw (read and write)
+	]]
+	if not tbl_6_upvr.Equipped then
+	else
+		if not tbl_6_upvr.ActuallyEquipped then return end
+		if not var628_upvw.HoldDownEnabled then return end
+		tbl_6_upvr.HoldDown = true
+		SetADS(true)
+		SetAnimationTrack("EmptyIdleAnim", "Stop")
+		SetAnimationTrack("IdleAnim", "Stop")
+		SetAnimationTrack("EmptyAimIdleAnim", "Stop")
+		SetAnimationTrack("AimIdleAnim", "Stop")
+		SetAnimationTrack("HoldDownAnim", "Play", var628_upvw.HoldDownAnimationSpeed)
+	end
+end
+function OnInspecting() -- Line 1862
+	--[[ Upvalues[5]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var628_upvw (read and write)
+		[3]: var630_upvw (read and write)
+		[4]: var629_upvw (read and write)
+		[5]: Thread_upvr (readonly)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	if not tbl_6_upvr.Reloading then
+		if not tbl_6_upvr.Overheated and tbl_6_upvr.ActuallyEquipped and tbl_6_upvr.Enabled and not tbl_6_upvr.AimDown and not tbl_6_upvr.Inspecting and not tbl_6_upvr.Switching and not tbl_6_upvr.Alting then
+			local var779
+			if var779 then
+				var779 = tbl_6_upvr
+				var779.Inspecting = true
+				local var780
+				local function INLINED_41() -- Internal function, doesn't exist in bytecode
+					var779 = var628_upvw.InspectAnimationSpeed
+					return var779
+				end
+				if not var630_upvw.InspectAnim or not INLINED_41() then
+					var779 = 0
+				end
+				var780 = var630_upvw.InspectAnim
+				local function INLINED_42() -- Internal function, doesn't exist in bytecode
+					var780 = var630_upvw.InspectAnim
+					return var780.Length
+				end
+				if not var780 or not INLINED_42() then
+				end
+				var780 = var629_upvw.Mag
+				if var780 <= 0 then
+					local function INLINED_43() -- Internal function, doesn't exist in bytecode
+						var780 = var628_upvw.EmptyInspectAnimationSpeed
+						return var780
+					end
+					if not var630_upvw.EmptyInspectAnim or not INLINED_43() then
+						local function INLINED_44() -- Internal function, doesn't exist in bytecode
+							var780 = var628_upvw.InspectAnimationSpeed
+							return var780
+						end
+						if not var630_upvw.InspectAnim or not INLINED_44() then
+							var780 = 0
+						end
+					end
+					var779 = var780
+					local function INLINED_45() -- Internal function, doesn't exist in bytecode
+						var780 = var630_upvw.EmptyInspectAnim.Length
+						return var780
+					end
+					if not var630_upvw.EmptyInspectAnim or not INLINED_45() then
+						local function INLINED_46() -- Internal function, doesn't exist in bytecode
+							var780 = var630_upvw.InspectAnim.Length
+							return var780
+						end
+						if not var630_upvw.InspectAnim or not INLINED_46() then
+							var780 = 0
+						end
+					end
+				end
+				var780 = SetAnimationTrack
+				var780("InspectAnim", "Play", var779)
+				var780 = os.clock()
+				repeat
+					Thread_upvr:Wait()
+				until not tbl_6_upvr.ActuallyEquipped and tbl_6_upvr.Reloading and tbl_6_upvr.Overheated and not tbl_6_upvr.Enabled and tbl_6_upvr.AimDown and tbl_6_upvr.Switching and tbl_6_upvr.Alting and var780 / var779 <= os.clock() - var780
+				tbl_6_upvr.Inspecting = false
+			end
+		end
+	end
+end
+function OnSwitching() -- Line 1877
+	--[[ Upvalues[6]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var628_upvw (read and write)
+		[3]: Thread_upvr (readonly)
+		[4]: SOME_8_upvw (read and write)
+		[5]: var627_upvw (read and write)
+		[6]: var629_upvw (read and write)
+	]]
+	if not tbl_6_upvr.Reloading then
+		if not tbl_6_upvr.Overheated and tbl_6_upvr.ActuallyEquipped and tbl_6_upvr.Enabled and not tbl_6_upvr.Switching and not tbl_6_upvr.Alting and var628_upvw.SelectiveFireEnabled then
+			tbl_6_upvr.Switching = true
+			SetAnimationTrack("InspectAnim", "Stop", nil, 0)
+			SetAnimationTrack("SwitchAnim", "Play", var628_upvw.SwitchAnimationSpeed)
+			repeat
+				Thread_upvr:Wait()
+			until not tbl_6_upvr.ActuallyEquipped and tbl_6_upvr.Reloading and tbl_6_upvr.Overheated and not tbl_6_upvr.Enabled and var628_upvw.SwitchTime <= os.clock() - os.clock()
+			tbl_6_upvr.Switching = false
+			if tbl_6_upvr.ActuallyEquipped and not tbl_6_upvr.Reloading and not tbl_6_upvr.Overheated and tbl_6_upvr.Enabled then
+				SOME_8_upvw[var627_upvw].SwitchSound:Play()
+				var629_upvw.FireMode = var629_upvw.FireMode % #var629_upvw.FireModes + 1
+				UpdateGUI()
+			end
+		end
+	end
+end
+function OnAlting() -- Line 1892
+	--[[ Upvalues[32]:
+		[1]: var592_2_upvr (readonly)
+		[2]: Setting_upvr_2 (readonly)
+		[3]: tbl_6_upvr (readonly)
+		[4]: var628_upvw (read and write)
+		[5]: SOME_8_upvw (read and write)
+		[6]: var627_upvw (read and write)
+		[7]: Thread_upvr (readonly)
+		[8]: Parent_upvr (readonly)
+		[9]: var629_upvw (read and write)
+		[10]: tbl_18_upvr (readonly)
+		[11]: var630_upvw (read and write)
+		[12]: var631_upvw (read and write)
+		[13]: var669_upvr (readonly)
+		[14]: var629_upvw (read and write)
+		[15]: var639_upvw (read and write)
+		[16]: var640_upvw (read and write)
+		[17]: var641_upvw (read and write)
+		[18]: var642_upvw (read and write)
+		[19]: var643_upvw (read and write)
+		[20]: var644_upvw (read and write)
+		[21]: var645_upvw (read and write)
+		[22]: var646_upvw (read and write)
+		[23]: var647_upvw (read and write)
+		[24]: var648_upvw (read and write)
+		[25]: tbl_4_upvr (readonly)
+		[26]: tbl_20_upvr (readonly)
+		[27]: Attachment_upvr_2 (readonly)
+		[28]: SOME_7_upvw (read and write)
+		[29]: GunVisualEffects_upvr_2 (readonly)
+		[30]: Scanners_upvr (readonly)
+		[31]: SmokeTrail_upvr_2 (readonly)
+		[32]: ProjectileMotion_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 3 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 3 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [16] 13. Error Block 4 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [16] 13. Error Block 4 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [20] 16. Error Block 5 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [20] 16. Error Block 5 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [24] 19. Error Block 6 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [24] 19. Error Block 6 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [28] 22. Error Block 7 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [28] 22. Error Block 7 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [32] 25. Error Block 8 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [32] 25. Error Block 8 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [36] 28. Error Block 9 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [36] 28. Error Block 9 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [121] 93. Error Block 22 start (CF ANALYSIS FAILED)
+	tbl_6_upvr.Alting = false
+	-- KONSTANTERROR: [121] 93. Error Block 22 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [129] 99. Error Block 23 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [129] 99. Error Block 23 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [133] 102. Error Block 24 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [133] 102. Error Block 24 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [137] 105. Error Block 25 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [137] 105. Error Block 25 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [829] 605. Error Block 221 start (CF ANALYSIS FAILED)
+	if var630_upvw.EmptyIdleAnim and var629_upvw.Mag <= 0 then
+		SetAnimationTrack("EmptyIdleAnim", "Play", var628_upvw.EmptyIdleAnimationSpeed)
+	else
+		SetAnimationTrack("IdleAnim", "Play", var628_upvw.IdleAnimationSpeed)
+	end
+	UpdateGUI()
+	tbl_4_upvr.CrossSpring.t = var628_upvw.CrossSize
+	tbl_4_upvr.CrossSpring.s = var628_upvw.CrossSpeed
+	tbl_4_upvr.CrossSpring.d = var628_upvw.CrossDamper
+	if tbl_6_upvr.ActuallyEquipped and var592_2_upvr.AutoReload and var629_upvw.Mag <= 0 then
+		Reload()
+	end
+	-- KONSTANTERROR: [829] 605. Error Block 221 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [900] 654. Error Block 144 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [900] 654. Error Block 144 end (CF ANALYSIS FAILED)
+end
+local VisualizeBeam_upvr_2 = Remotes.VisualizeBeam
+local module_upvr_4 = require(Setting_upvr_2:WaitForChild("ConditionableGunMods"))
+local SettingModifier_upvr = require(Modules_2.SettingModifier)
+function OnFiring() -- Line 2055
+	--[[ Upvalues[42]:
+		[1]: var629_upvw (read and write)
+		[2]: var628_upvw (read and write)
+		[3]: tbl_6_upvr (readonly)
+		[4]: Humanoid_upvr_2 (readonly)
+		[5]: module_upvr (readonly)
+		[6]: var627_upvw (read and write)
+		[7]: Parent_upvr (readonly)
+		[8]: var629_upvw (read and write)
+		[9]: var592_2_upvr (readonly)
+		[10]: SOME_8_upvw (read and write)
+		[11]: Thread_upvr (readonly)
+		[12]: Get3DPosition2_upvr (readonly)
+		[13]: CastRay_upvr (readonly)
+		[14]: tbl_36_upvr (readonly)
+		[15]: VisibleMuzzle_upvr (readonly)
+		[16]: tbl_20_upvr (readonly)
+		[17]: Attachment_upvr_2 (readonly)
+		[18]: Miscs_upvr_2 (readonly)
+		[19]: CurrentCamera_upvr (readonly)
+		[20]: TweenService_upvr_2 (readonly)
+		[21]: Workspace_upvr (readonly)
+		[22]: VisualizeBeam_upvr_2 (readonly)
+		[23]: any_GenerateGUID_result1_upvr (readonly)
+		[24]: ShatterGlass_upvr (readonly)
+		[25]: CloneTable_upvr (readonly)
+		[26]: InflictTarget_upvr_2 (readonly)
+		[27]: unpack_result1_upvr_2 (readonly)
+		[28]: var669_upvr (readonly)
+		[29]: ChangeMagAndAmmo_upvr_2 (readonly)
+		[30]: OverlapParams_new_result1_upvr_2 (readonly)
+		[31]: any_Wait_result1_upvw (read and write)
+		[32]: SmokeTrail_upvr_2 (readonly)
+		[33]: gunEvent_upvr_2 (readonly)
+		[34]: module_upvr_4 (readonly)
+		[35]: SettingModifier_upvr (readonly)
+		[36]: HttpService_upvr_2 (readonly)
+		[37]: var641_upvw (read and write)
+		[38]: var639_upvw (read and write)
+		[39]: var648_upvw (read and write)
+		[40]: FindNearestEntity_upvr (readonly)
+		[41]: Scanners_upvr (readonly)
+		[42]: CheckPartInScanner_upvr (readonly)
+	]]
+	-- KONSTANTERROR: Failed to generate AST for function `OnFiring`:
+assertion failed!
+Traceback:
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+K
+
+end
+function OnStoppingFiring() -- Line 3255
+	--[[ Upvalues[2]:
+		[1]: tbl_6_upvr (readonly)
+		[2]: var628_upvw (read and write)
+	]]
+	tbl_6_upvr.Down = false
+	if var628_upvw.ChargedShotAdvanceEnabled or var628_upvw.HoldAndReleaseEnabled then
+		tbl_6_upvr.Charging = false
+	end
+	if var628_upvw.HoldAndReleaseEnabled and not tbl_6_upvr.Charged then
+		tbl_6_upvr.Enabled = true
+	end
+end
+function OnMeleeHit(arg1, arg2, arg3) -- Line 3265
+	--[[ Upvalues[10]:
+		[1]: var628_upvw (read and write)
+		[2]: tbl_6_upvr (readonly)
+		[3]: ShatterGlass_upvr (readonly)
+		[4]: HumanoidRootPart_3_upvr (readonly)
+		[5]: Thread_upvr (readonly)
+		[6]: Parent_upvr (readonly)
+		[7]: any_Wait_result1_upvw (read and write)
+		[8]: gunEvent_upvr_2 (readonly)
+		[9]: DamageModule_upvr (readonly)
+		[10]: InflictTarget_upvr_2 (readonly)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	local var784
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 3. Error Block 2 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 3. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [38] 28. Error Block 9 start (CF ANALYSIS FAILED)
+	local function var785() -- Line 3271
+		--[[ Upvalues[1]:
+			[1]: tbl_6_upvr (copied, readonly)
+		]]
+		tbl_6_upvr.AlreadyHit = false
+	end
+	Thread_upvr:Delay(var628_upvw.EffectDelay, var785)
+	do
+		return
+	end
+	-- KONSTANTERROR: [38] 28. Error Block 9 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [48] 36. Error Block 122 start (CF ANALYSIS FAILED)
+	local class_Model_upvr_3 = arg1:FindFirstAncestorOfClass("Model")
+	local var787
+	var785 = nil
+	local var788 = var785
+	if class_Model_upvr_3 then
+		var787 = class_Model_upvr_3:FindFirstChild("CanBlock")
+		local class_Humanoid_upvw = class_Model_upvr_3:FindFirstChildOfClass("Humanoid")
+		local HumanoidRootPart_4 = class_Model_upvr_3:FindFirstChild("HumanoidRootPart")
+		if not HumanoidRootPart_4 then
+			HumanoidRootPart_4 = class_Model_upvr_3:FindFirstChild("Head")
+		end
+		var788 = HumanoidRootPart_4
+		local HumanoidRootPart = class_Model_upvr_3:FindFirstChild("HumanoidRootPart")
+		if not HumanoidRootPart then
+			HumanoidRootPart = class_Model_upvr_3:FindFirstChild("Torso")
+			if not HumanoidRootPart then
+				HumanoidRootPart = class_Model_upvr_3:FindFirstChild("UpperTorso")
+			end
+		end
+	end
+	local tbl_22 = {
+		Tool = Parent_upvr;
+		ModuleName = var628_upvw.ModuleName;
+	}
+	local function INLINED_47() -- Internal function, doesn't exist in bytecode
+		var784 = var788.Position
+		return var784
+	end
+	if not var788 or not INLINED_47() then
+		var784 = arg1.Position
+	end
+	tbl_22.Direction = (var784 - HumanoidRootPart_3_upvr.Position).Unit
+	tbl_22.Blocked = false
+	local TEAM = any_Wait_result1_upvw:FindFirstChild("TEAM")
+	if var787 then
+		var784 = var628_upvw.BlockMelee
+		if var784 then
+			if TEAM then
+				var784 = var787:FindFirstChild("TEAM")
+				if var784 then
+					var784 = var787.TEAM.Value
+					if var784 ~= TEAM.Value then
+						tbl_22.Blocked = true
+						-- KONSTANTWARNING: GOTO [150] #112
+					end
+					-- KONSTANTWARNING: GOTO [150] #112
+				end
+			end
+			tbl_22.Blocked = true
+		end
+	end
+	local function INLINED_48() -- Internal function, doesn't exist in bytecode
+		var784 = arg1.Position
+		return var784
+	end
+	if not arg2 or not INLINED_48() then
+		var784 = arg3[2]
+	end
+	if arg2 then
+	else
+	end
+	if not arg2 or not arg1.Material then
+	end
+	local var794
+	if class_Humanoid_upvw and var788 then
+		local function INLINED_49() -- Internal function, doesn't exist in bytecode
+			var794 = HumanoidRootPart.Position
+			return var794
+		end
+		if not arg2 or not INLINED_49() then
+			var794 = arg3[2]
+		end
+		var784 = var794
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+		if true then
+			var794 = table.find(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+			if not var794 then
+				var794 = table.insert
+				var794(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+				if not arg2 then
+					var794 = var628_upvw.BlockDelay
+					if var794 ~= math.huge then
+						var794 = Thread_upvr
+						var794 = var794:Delay
+						var794(var628_upvw.BlockDelay, function() -- Line 3316
+							--[[ Upvalues[2]:
+								[1]: tbl_6_upvr (copied, readonly)
+								[2]: class_Model_upvr_3 (readonly)
+							]]
+							local table_find_result1_3 = table.find(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+							if table_find_result1_3 then
+								table.remove(tbl_6_upvr.BlockedModels, table_find_result1_3)
+							end
+						end)
+					end
+				end
+				var794 = gunEvent_upvr_2:Fire
+				var794("VisualizeHitEffect", "Normal", arg1, var784, arg3[3], arg3[4], tbl_22, true)
+			end
+			return
+		end
+		var794 = class_Humanoid_upvw.Health
+		if 0 < var794 then
+			var794 = DamageModule_upvr.CanDamage(class_Model_upvr_3, any_Wait_result1_upvw, var628_upvw.FriendlyFire)
+			if var794 then
+				var794 = #tbl_6_upvr.MeleeHitHumanoids
+				if var794 < var628_upvw.MaxHits then
+					var794 = table.find(tbl_6_upvr.MeleeHitHumanoids, class_Humanoid_upvw)
+					if not var794 then
+						var794 = table.find(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+						if not var794 then
+							var794 = table.insert
+							var794(tbl_6_upvr.MeleeHitHumanoids, class_Humanoid_upvw)
+							if not arg2 then
+								var794 = var628_upvw.HitIgnoreDelay
+								if var794 ~= math.huge then
+									var794 = Thread_upvr
+									var794 = var794:Delay
+									var794(var628_upvw.HitIgnoreDelay, function() -- Line 3333
+										--[[ Upvalues[2]:
+											[1]: tbl_6_upvr (copied, readonly)
+											[2]: class_Humanoid_upvw (read and write)
+										]]
+										local table_find_result1_5 = table.find(tbl_6_upvr.MeleeHitHumanoids, class_Humanoid_upvw)
+										if table_find_result1_5 then
+											table.remove(tbl_6_upvr.MeleeHitHumanoids, table_find_result1_5)
+										end
+									end)
+								end
+							end
+							var794 = gunEvent_upvr_2:Fire
+							-- KONSTANTERROR: Expression was reused, decompilation is incorrect (x2)
+							var794("VisualizeHitEffect", "Blood", arg1, var784, arg3[3], arg3[4], tbl_22, true)
+							var794 = Thread_upvr
+							local function var799() -- Line 3341
+								--[[ Upvalues[4]:
+									[1]: InflictTarget_upvr_2 (copied, readonly)
+									[2]: Parent_upvr (copied, readonly)
+									[3]: arg1 (readonly)
+									[4]: var628_upvw (copied, read and write)
+								]]
+								InflictTarget_upvr_2:FireServer("GunMelee", Parent_upvr, arg1, arg1.Size, var628_upvw.ModuleName)
+							end
+							var794 = var794:Spawn
+							var794(var799)
+							var794 = MarkHit
+							var799 = false
+							local var800 = var799
+							if arg1.Name == "Head" then
+								var800 = var628_upvw.MeleeHeadshotHitmarker
+							end
+							var794(var628_upvw, var800)
+							-- KONSTANTWARNING: GOTO [399] #308
+						end
+						-- KONSTANTWARNING: GOTO [399] #308
+					end
+					-- KONSTANTWARNING: GOTO [399] #308
+				end
+				-- KONSTANTWARNING: GOTO [399] #308
+			end
+			-- KONSTANTWARNING: GOTO [399] #308
+		end
+	else
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+		if true then
+			var794 = table.find(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+			if not var794 then
+				var794 = table.insert
+				var794(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+				if not arg2 then
+					var794 = var628_upvw.BlockDelay
+					if var794 ~= math.huge then
+						var794 = Thread_upvr
+						var794 = var794:Delay
+						var794(var628_upvw.BlockDelay, function() -- Line 3354
+							--[[ Upvalues[2]:
+								[1]: tbl_6_upvr (copied, readonly)
+								[2]: class_Model_upvr_3 (readonly)
+							]]
+							local table_find_result1 = table.find(tbl_6_upvr.BlockedModels, class_Model_upvr_3)
+							if table_find_result1 then
+								table.remove(tbl_6_upvr.BlockedModels, table_find_result1)
+							end
+						end)
+					end
+				end
+				var794 = gunEvent_upvr_2:Fire
+				-- KONSTANTERROR: Expression was reused, decompilation is incorrect (x2)
+				var794("VisualizeHitEffect", "Normal", arg1, var784, arg3[3], arg3[4], tbl_22, true)
+				-- KONSTANTWARNING: GOTO [399] #308
+			end
+		else
+			var794 = tbl_6_upvr.AlreadyHit
+			if not var794 then
+				var794 = tbl_6_upvr
+				var794.AlreadyHit = true
+				var794 = gunEvent_upvr_2:Fire
+				-- KONSTANTERROR: Expression was reused, decompilation is incorrect (x2)
+				var794("VisualizeHitEffect", "Normal", arg1, var784, arg3[3], arg3[4], tbl_22, true)
+				var794 = var628_upvw.TriggerEffectOnce
+				if not var794 then
+					var794 = Thread_upvr
+					var794 = var794:Delay
+					var794(var628_upvw.EffectDelay, function() -- Line 3368
+						--[[ Upvalues[1]:
+							[1]: tbl_6_upvr (copied, readonly)
+						]]
+						tbl_6_upvr.AlreadyHit = false
+					end)
+				end
+			end
+		end
+	end
+	-- KONSTANTERROR: [48] 36. Error Block 122 end (CF ANALYSIS FAILED)
+end
+local RotatedRegion3_upvr_2 = Utilities.RotatedRegion3
+local RaycastHitboxV4_upvr = Utilities.RaycastHitboxV4
+function OnMeleeAttacking() -- Line 3378
+	--[[ Upvalues[19]:
+		[1]: var628_upvw (read and write)
+		[2]: var630_upvw (read and write)
+		[3]: tbl_6_upvr (readonly)
+		[4]: Humanoid_upvr_2 (readonly)
+		[5]: module_upvr (readonly)
+		[6]: var627_upvw (read and write)
+		[7]: Parent_upvr (readonly)
+		[8]: var629_upvw (read and write)
+		[9]: var629_upvw (read and write)
+		[10]: var592_2_upvr (readonly)
+		[11]: SOME_8_upvw (read and write)
+		[12]: HumanoidRootPart_3_upvr (readonly)
+		[13]: CurrentCamera_upvr (readonly)
+		[14]: RotatedRegion3_upvr_2 (readonly)
+		[15]: tbl_36_upvr (readonly)
+		[16]: Debris_upvr_2 (readonly)
+		[17]: any_Wait_result1_upvw (read and write)
+		[18]: RaycastHitboxV4_upvr (readonly)
+		[19]: RaycastParams_new_result1_upvr (readonly)
+	]]
+	if var628_upvw.MeleeAttackEnabled then
+		if var630_upvw.MeleeAttackAnim and 0 < var630_upvw.MeleeAttackAnim.Length then
+			if tbl_6_upvr.ActuallyEquipped and tbl_6_upvr.Enabled then
+				if not tbl_6_upvr.Overheated and not tbl_6_upvr.Switching and not tbl_6_upvr.Alting then
+					if not tbl_6_upvr.AimDown then
+						local Health = Humanoid_upvr_2.Health
+						if 0 < Health then
+							if module_upvr[var627_upvw] ~= nil then
+								Health = module_upvr[var627_upvw](Parent_upvr, Humanoid_upvr_2, var629_upvw.Heat, var628_upvw.MaxHeat, var629_upvw.Mag, var628_upvw.AmmoPerMag, var629_upvw.Ammo, var629_upvw.MaxAmmo, tbl_6_upvr.ShootCounts, tbl_6_upvr.CurrentFireRate)
+							else
+								Health = true
+							end
+							if Health then
+								Health = var592_2_upvr.CancelReload
+								if Health then
+									Health = tbl_6_upvr.Reloading
+									if Health then
+										Health = tbl_6_upvr.CanCancelReload
+										if not Health then
+											Health = tbl_6_upvr
+											Health.CanCancelReload = true
+											-- KONSTANTWARNING: GOTO [109] #83
+										end
+										-- KONSTANTWARNING: GOTO [109] #83
+									end
+								else
+									Health = tbl_6_upvr.Reloading
+									if Health then return end
+								end
+								Health = tbl_6_upvr
+								Health.Enabled = false
+								Health = SetAnimationTrack
+								Health("InspectAnim", "Stop", nil, 0)
+								Health = SetAnimationTrack
+								Health("MeleeAttackAnim", "Play", var628_upvw.MeleeAttackAnimationSpeed, 0.05)
+								Health = tbl_6_upvr.ActuallyEquipped
+								if Health then
+									Health = SOME_8_upvw[var627_upvw]:FindFirstChild("MeleeSwingSound")
+									if Health then
+										Health = SOME_8_upvw[var627_upvw].MeleeSwingSound:Play
+										Health()
+									end
+								end
+								Health = var630_upvw.MeleeAttackAnim:GetMarkerReachedSignal("MeleeDamageSequence")
+								local var808_upvw
+								Health = Health:Connect(function(arg1) -- Line 3399
+									--[[ Upvalues[12]:
+										[1]: tbl_6_upvr (copied, readonly)
+										[2]: var628_upvw (copied, read and write)
+										[3]: HumanoidRootPart_3_upvr (copied, readonly)
+										[4]: CurrentCamera_upvr (copied, readonly)
+										[5]: RotatedRegion3_upvr_2 (copied, readonly)
+										[6]: tbl_36_upvr (copied, readonly)
+										[7]: Debris_upvr_2 (copied, readonly)
+										[8]: Parent_upvr (copied, readonly)
+										[9]: any_Wait_result1_upvw (copied, read and write)
+										[10]: RaycastHitboxV4_upvr (copied, readonly)
+										[11]: RaycastParams_new_result1_upvr (copied, readonly)
+										[12]: var808_upvw (read and write)
+									]]
+									-- KONSTANTERROR: [0] 1. Error Block 62 start (CF ANALYSIS FAILED)
+									table.clear(tbl_6_upvr.BlockedModels)
+									table.clear(tbl_6_upvr.MeleeHitHumanoids)
+									if var628_upvw.HitboxType == "RotatedRegion" then
+										local Part_2 = Instance.new("Part")
+										Part_2.CanCollide = false
+										Part_2.CastShadow = false
+										Part_2.Massless = true
+										Part_2.Transparency = 1
+										Part_2.Material = Enum.Material.SmoothPlastic
+										Part_2.Shape = var628_upvw.HitboxShape
+										Part_2.Size = var628_upvw.HitboxSize
+										Part_2.Color = Color3.new(1, 0, 0)
+										Part_2.CFrame = HumanoidRootPart_3_upvr.CFrame * var628_upvw.HitboxCFrame
+										Part_2.Parent = CurrentCamera_upvr
+										local WeldConstraint_3 = Instance.new("WeldConstraint")
+										WeldConstraint_3.Part0 = Part_2
+										WeldConstraint_3.Part1 = HumanoidRootPart_3_upvr
+										WeldConstraint_3.Parent = Part_2
+										for _, v_21 in pairs(RotatedRegion3_upvr_2.new(Part_2.CFrame, Part_2.Size):FindPartsInRegion3WithIgnoreList(tbl_36_upvr, var628_upvw.MaxPartsInRegion)) do
+											if v_21 and v_21.Parent ~= nil then
+												OnMeleeHit(v_21, Part_2, nil)
+											end
+										end
+										Debris_upvr_2:AddItem(Part_2, 0.2)
+										-- KONSTANTWARNING: GOTO [286] #206
+									end
+									-- KONSTANTERROR: [0] 1. Error Block 62 end (CF ANALYSIS FAILED)
+									-- KONSTANTERROR: [118] 81. Error Block 60 start (CF ANALYSIS FAILED)
+									if var628_upvw.TriggerEffectOnce then
+										tbl_6_upvr.AlreadyHit = false
+									end
+									if var628_upvw.RaycastHitboxInstances[1][1] == "Tool" then
+										-- KONSTANTWARNING: GOTO [153] #109
+									end
+									-- KONSTANTERROR: [118] 81. Error Block 60 end (CF ANALYSIS FAILED)
+								end)
+								var808_upvw = Health
+								Health = var630_upvw.MeleeAttackAnim:GetMarkerReachedSignal("MeleeDamageEndSequence")
+								local var818_upvw
+								Health = Health:Connect(function(arg1) -- Line 3475
+									--[[ Upvalues[2]:
+										[1]: tbl_6_upvr (copied, readonly)
+										[2]: var818_upvw (read and write)
+									]]
+									if tbl_6_upvr.Hitbox then
+										tbl_6_upvr.Hitbox:HitStop()
+										tbl_6_upvr.Hitbox:Destroy()
+										tbl_6_upvr.Hitbox = nil
+									end
+									if tbl_6_upvr.Hitbox2 then
+										tbl_6_upvr.Hitbox2:HitStop()
+										tbl_6_upvr.Hitbox2:Destroy()
+										tbl_6_upvr.Hitbox2 = nil
+									end
+									if var818_upvw then
+										var818_upvw:Disconnect()
+										var818_upvw = nil
+									end
+								end)
+								var818_upvw = Health
+								Health = var630_upvw.MeleeAttackAnim.Stopped:Wait
+								Health()
+								Health = tbl_6_upvr.Hitbox
+								if Health then
+									Health = tbl_6_upvr.Hitbox:HitStop
+									Health()
+									Health = tbl_6_upvr.Hitbox:Destroy
+									Health()
+									Health = tbl_6_upvr
+									Health.Hitbox = nil
+								end
+								Health = tbl_6_upvr.Hitbox2
+								if Health then
+									Health = tbl_6_upvr.Hitbox2:HitStop
+									Health()
+									Health = tbl_6_upvr.Hitbox2:Destroy
+									Health()
+									Health = tbl_6_upvr
+									Health.Hitbox2 = nil
+								end
+								Health = tbl_6_upvr
+								Health.Enabled = true
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+function OnUnequipping(arg1) -- Line 3511
+	--[[ Upvalues[18]:
+		[1]: var592_2_upvr (readonly)
+		[2]: Parent_upvr (readonly)
+		[3]: tbl_6_upvr (readonly)
+		[4]: var628_upvw (read and write)
+		[5]: JumpButton_upvw_2 (read and write)
+		[6]: tbl_21_upvr (readonly)
+		[7]: var669_upvr (readonly)
+		[8]: UserInputService_upvr (readonly)
+		[9]: RunService_upvr_2 (readonly)
+		[10]: var583_upvr (readonly)
+		[11]: gunEvent_upvr_2 (readonly)
+		[12]: any_Wait_result1_upvw (read and write)
+		[13]: SOME_8_upvw (read and write)
+		[14]: var627_upvw (read and write)
+		[15]: VisibleMuzzle_upvr (readonly)
+		[16]: any_GenerateGUID_result1_upvr (readonly)
+		[17]: tbl_20_upvr (readonly)
+		[18]: Attachment_upvr_2 (readonly)
+	]]
+	if var592_2_upvr.CustomGripEnabled then
+		if not Parent_upvr.RequiresHandle then
+			SetCustomGrip(false)
+		end
+	end
+	if var592_2_upvr.DualWeldEnabled and not var592_2_upvr.CustomGripEnabled and Parent_upvr.RequiresHandle and tbl_6_upvr.Grip2 then
+		tbl_6_upvr.Grip2:Destroy()
+	end
+	if var628_upvw.ChargedShotAdvanceEnabled then
+		tbl_6_upvr.Charging = false
+	end
+	if var628_upvw.HoldAndReleaseEnabled then
+		tbl_6_upvr.Charged = false
+	end
+	tbl_6_upvr.Equipped = false
+	tbl_6_upvr.ActuallyEquipped = false
+	if JumpButton_upvw_2 then
+		tbl_21_upvr.AimButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.FireButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.HoldDownButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.InspectButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.ReloadButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.SwitchButton.Parent = var669_upvr.MobileButtons
+		tbl_21_upvr.AltButton.Parent = var669_upvr.MobileButtons
+	end
+	var669_upvr.Parent = script
+	UserInputService_upvr.MouseIconEnabled = true
+	RunService_upvr_2:UnbindFromRenderStep(var583_upvr)
+	RemoveStuff(true)
+	if var628_upvw.BatteryEnabled then
+		gunEvent_upvr_2:Fire("VisualizeOverheat", var628_upvw.OverheatEffect, "End", any_Wait_result1_upvw, Parent_upvr, SOME_8_upvw, true)
+	end
+	if arg1 and var628_upvw.LaserBeam then
+		VisibleMuzz(SOME_8_upvw:FindFirstChild("GunMuzzlePoint"..var627_upvw), false)
+		VisibleMuzzle_upvr:FireServer(SOME_8_upvw:FindFirstChild("GunMuzzlePoint"..var627_upvw), false)
+		gunEvent_upvr_2:Fire("RemoveBeam", any_GenerateGUID_result1_upvr, Parent_upvr, var628_upvw.ModuleName, tbl_20_upvr, tbl_6_upvr.LaserTrail, tbl_6_upvr.BoltSegments, Attachment_upvr_2)
+	end
+	SetADS(true)
+end
+tbl_21_upvr.AimButton.MouseButton1Click:Connect(function() -- Line 3555
+	SetADS()
+end)
+tbl_21_upvr.InspectButton.MouseButton1Click:Connect(function() -- Line 3563
+	OnInspecting()
+end)
+tbl_21_upvr.SwitchButton.MouseButton1Click:Connect(function() -- Line 3567
+	OnSwitching()
+end)
+tbl_21_upvr.ReloadButton.MouseButton1Click:Connect(function() -- Line 3571
+	Reload()
+end)
+tbl_21_upvr.FireButton.MouseButton1Down:Connect(function() -- Line 3575
+	OnFiring()
+end)
+tbl_21_upvr.FireButton.MouseButton1Up:Connect(function() -- Line 3579
+	OnStoppingFiring()
+end)
+tbl_21_upvr.SubFireButton.MouseButton1Down:Connect(function() -- Line 3583
+	OnFiring()
+end)
+tbl_21_upvr.SubFireButton.MouseButton1Up:Connect(function() -- Line 3587
+	OnStoppingFiring()
+end)
+tbl_21_upvr.MeleeButton.MouseButton1Click:Connect(function() -- Line 3591
+	OnMeleeAttacking()
+end)
+tbl_21_upvr.AltButton.MouseButton1Click:Connect(function() -- Line 3595
+	OnAlting()
+end)
+UserInputService_upvr.InputBegan:Connect(function(arg1, arg2) -- Line 3599
+	--[[ Upvalues[3]:
+		[1]: UserInputService_upvr (readonly)
+		[2]: CurrentCamera_upvr (readonly)
+		[3]: var592_2_upvr (readonly)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	if arg2 then
+	else
+		local var830
+		if not var830 then
+			var830 = nil
+			if arg1.UserInputType == Enum.UserInputType.Keyboard then
+				var830 = "Keyboard"
+			elseif arg1.UserInputType == Enum.UserInputType.Gamepad1 then
+				var830 = "Controller"
+			end
+			if (CurrentCamera_upvr.Focus.p - CurrentCamera_upvr.CoordinateFrame.p).Magnitude > 1 then
+			else
+			end
+			if var592_2_upvr.ThirdPersonADS then
+				local var831 = true
+				if (CurrentCamera_upvr.Focus.p - CurrentCamera_upvr.CoordinateFrame.p).Magnitude > 1 then
+					if UserInputService_upvr.MouseBehavior ~= Enum.MouseBehavior.LockCenter then
+						var831 = false
+					else
+						var831 = true
+					end
+				end
+			end
+			if arg1.UserInputType == Enum.UserInputType.MouseButton1 or var830 == "Controller" and arg1.KeyCode == var592_2_upvr.Controller.Fire then
+				OnFiring()
+			elseif arg1.UserInputType == Enum.UserInputType.MouseButton2 and var831 then
+				SetADS()
+			end
+			if var830 then
+				if arg1.KeyCode == var592_2_upvr[var830].Reload then
+					Reload()
+					return
+				end
+				if arg1.KeyCode == var592_2_upvr[var830].Inspect then
+					OnInspecting()
+					return
+				end
+				if arg1.KeyCode == var592_2_upvr[var830].Switch then
+					OnSwitching()
+					return
+				end
+				if arg1.KeyCode == var592_2_upvr[var830].ToogleAim then
+					SetADS()
+					return
+				end
+				if arg1.KeyCode == var592_2_upvr[var830].Melee then
+					OnMeleeAttacking()
+					return
+				end
+				if arg1.KeyCode == var592_2_upvr[var830].AltFire then
+					OnAlting()
+				end
+			end
+		end
+	end
+end)
+UserInputService_upvr.InputEnded:Connect(function(arg1, arg2) -- Line 3639
+	--[[ Upvalues[3]:
+		[1]: UserInputService_upvr (readonly)
+		[2]: CurrentCamera_upvr (readonly)
+		[3]: var592_2_upvr (readonly)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	if arg2 then
+	else
+		local var833
+		if not var833 then
+			var833 = nil
+			if arg1.UserInputType == Enum.UserInputType.Keyboard then
+				var833 = "Keyboard"
+			elseif arg1.UserInputType == Enum.UserInputType.Gamepad1 then
+				var833 = "Controller"
+			end
+			if (CurrentCamera_upvr.Focus.p - CurrentCamera_upvr.CoordinateFrame.p).Magnitude > 1 then
+			else
+			end
+			if var592_2_upvr.ThirdPersonADS then
+				local var834 = true
+				if (CurrentCamera_upvr.Focus.p - CurrentCamera_upvr.CoordinateFrame.p).Magnitude > 1 then
+					if UserInputService_upvr.MouseBehavior ~= Enum.MouseBehavior.LockCenter then
+						var834 = false
+					else
+						var834 = true
+					end
+				end
+			end
+			if arg1.UserInputType == Enum.UserInputType.MouseButton1 or var833 == "Controller" and arg1.KeyCode == var592_2_upvr.Controller.Fire then
+				OnStoppingFiring()
+				return
+			end
+			if arg1.UserInputType == Enum.UserInputType.MouseButton2 and var834 then
+				SetADS(true)
+			end
+		end
+	end
+end)
+script:WaitForChild("MarkerEvent").Event:Connect(MarkHit)
+ChangeMagAndAmmo_upvr_2.OnClientEvent:Connect(function(arg1, arg2) -- Line 3664
+	--[[ Upvalues[3]:
+		[1]: tbl_18_upvr (readonly)
+		[2]: var592_2_upvr (readonly)
+		[3]: var629_upvw (read and write)
+	]]
+	for _, v_22 in ipairs(arg1) do
+		tbl_18_upvr[v_22.Id].Mag = v_22.Mag
+		if not var592_2_upvr.UniversalAmmoEnabled then
+			tbl_18_upvr[v_22.Id].Ammo = v_22.Ammo
+		end
+		tbl_18_upvr[v_22.Id].Heat = v_22.Heat
+	end
+	if var592_2_upvr.UniversalAmmoEnabled then
+		var629_upvw.Ammo = arg2
+	end
+	UpdateGUI()
+end)
+function OnMoving() -- Line 3678
+	--[[ Upvalues[1]:
+		[1]: Humanoid_upvr_2 (readonly)
+	]]
+	if 0 < Humanoid_upvr_2.MoveDirection.Magnitude then
+		if 17 <= Humanoid_upvr_2.WalkSpeed then
+			OnRunning()
+		else
+			OnWalking()
+		end
+	end
+	OnIdle()
+end
+local LeftHand_upvr = LocalPlayer_upvr.CharacterAdded:Wait():FindFirstChild("LeftHand")
+Parent_upvr.Equipped:Connect(function() -- Line 3690
+	--[[ Upvalues[22]:
+		[1]: var592_2_upvr (readonly)
+		[2]: Parent_upvr (readonly)
+		[3]: RightHand_upvr (readonly)
+		[4]: tbl_6_upvr (readonly)
+		[5]: LeftHand_upvr (readonly)
+		[6]: JumpButton_upvw_2 (read and write)
+		[7]: tbl_21_upvr (readonly)
+		[8]: var669_upvr (readonly)
+		[9]: LocalPlayer_upvr (readonly)
+		[10]: UserInputService_upvr (readonly)
+		[11]: var628_upvw (read and write)
+		[12]: tbl_4_upvr (readonly)
+		[13]: Scanners_upvr (readonly)
+		[14]: GunVisualEffects_upvr_2 (readonly)
+		[15]: ProjectileMotion_upvr (readonly)
+		[16]: SOME_8_upvw (read and write)
+		[17]: var627_upvw (read and write)
+		[18]: var629_upvw (read and write)
+		[19]: RunService_upvr_2 (readonly)
+		[20]: var583_upvr (readonly)
+		[21]: var630_upvw (read and write)
+		[22]: Thread_upvr (readonly)
+	]]
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [4] 4. Error Block 2 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [8] 7. Error Block 3 start (CF ANALYSIS FAILED)
+	task.spawn(function() -- Line 3692
+		SetCustomGrip(true)
+	end)
+	-- KONSTANTERROR: [8] 7. Error Block 3 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 4 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 10. Error Block 4 end (CF ANALYSIS FAILED)
+end)
+Humanoid_upvr_2:GetPropertyChangedSignal("WalkSpeed"):Connect(OnMoving)
+Humanoid_upvr_2:GetPropertyChangedSignal("MoveDirection"):Connect(OnMoving)
+Parent_upvr.Unequipped:Connect(function() -- Line 3774
+	--[[ Upvalues[2]:
+		[1]: Parent_upvr (readonly)
+		[2]: Workspace_upvr (readonly)
+	]]
+	local var845
+	if Parent_upvr.Parent ~= Workspace_upvr then
+		var845 = false
+	else
+		var845 = true
+	end
+	OnUnequipping(var845)
+end)
+Humanoid_upvr_2.Died:Connect(function() -- Line 3778
+	OnUnequipping(true)
+end)
+Parent_upvr.AncestryChanged:Connect(function() -- Line 3782
+	--[[ Upvalues[1]:
+		[1]: Parent_upvr (readonly)
+	]]
+	if not Parent_upvr:IsDescendantOf(game) then
+		OnUnequipping(true)
+	end
+end)
