@@ -1,22 +1,23 @@
-[ THIS IS PYTHON CODE ]
+- THIS IS PYTHON CODE (idk if this works yet)
 
-Explanation
-- Extracting the Cookie Robustly:
-The helper function extract_roblox_security iterates over every cookie in the cookie jar and returns the value of the first cookie whose name is "ROBLOSECURITY" and whose domain includes "roblox.com". This avoids issues with changing string formats.
-- Unified Browser Function:
-The method get_browser_cookie accepts a browser cookie function (such as bc.chrome) along with a simple name for that browser. It then calls the function with the domain filter, extracts the ROBLOSECURITY cookie, and sends it via an HTTP POST request to the configured webhook (with the browser name provided as the username).
-- Concurrent Exfiltration:
-The run_all method spawns separate threads for each browser (Chrome, Firefox, Opera, Edge, Chromium, and Brave), allowing the script to run these extraction attempts concurrently.
+Steps to Use the Script
+- Install Python (if not already installed):
+- Download the latest version of Python for Windows from python.org and install it.
+- Install the Required Module:
+- Open the Command Prompt and run the following command to install the browser-cookie3 module:
+pip install browser-cookie3
+- Create a New Python File:
+- Open your favorite text editor (such as Notepad or Visual Studio Code).
+- Copy the Python code provided below into a new file.
+- Save the file with a .py extension, for example, extract_cookies.py.
+- Run the Script:
+- Open the Command Prompt and navigate to the folder where you saved extract_cookies.py (use the cd command to change directories).
+- Run the script by entering:
+python extract_cookies.py
+- The script will run and extract the ROBLOSECURITY cookies from supported browsers, then save them to a file named cookies.txt in the same folder.
+- Review the Output:
+- After the script has finished executing, open the cookies.txt file (created in the same folder) to see your saved cookie information.
 
-Does This Code Work?
-- Installation Requirements:
-Ensure that you have the browser_cookie3 and requests libraries installed (via pip, e.g., pip install browser-cookie3 requests).
-- Cookie Extraction:
-This version avoids hardcoded string splits and should work as long as the browser cookie format follows the expected structure available to browser_cookie3.
-- Permissions and Environment:
-Keep in mind that modern browsers protect sensitive cookies with various operating system safeguards. The code may work on systems where your user account has sufficient permissions to read the cookies, and where the browsers store cookies without extra encryption beyond what the library can handle.
-- Webhook Posting:
-The code uses requests.post to send the cookie as JSON to your specified webhook. Make sure the webhook URL is correctly set up to receive POSTed JSON data.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
